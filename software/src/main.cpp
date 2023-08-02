@@ -12,13 +12,15 @@ void setup() {
     while (!Serial) { // needed to keep leonardo/micro from starting too fast!
         delay(10);
     }
-    Serial.println("[INFO] Flannithm is starting up...");
+    Serial.println("[INFO] Frannithm is starting up...");
+    
     touchSetup();
-    // airSetup();
-    // airCalibrate();
+    airSetup();
+    airCalibrate();
 }
 
 void loop() {
 	// airDebug();
+    airLoop();
     touchLoop();
 }

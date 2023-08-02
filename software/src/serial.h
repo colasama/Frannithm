@@ -2,7 +2,8 @@
 #define SERIAL_H
 #include <stdint.h>
 
-enum {
+enum
+{
 	SLIDER_CMD_AUTO_SCAN = 0x01,
 	SLIDER_CMD_SET_LED = 0x02,
 	SLIDER_CMD_AUTO_SCAN_START = 0x03,
@@ -13,13 +14,17 @@ enum {
 	SLIDER_CMD_GET_BOARD_INFO = 0xF0
 };
 
-typedef union slider_packet {
-	struct {
+typedef union slider_packet
+{
+	struct
+	{
 		uint8_t syn;
 		uint8_t cmd;
 		uint8_t size;
-		union {
-			struct {
+		union
+		{
+			struct
+			{
 				uint8_t led_unk;
 				uint8_t leds[96];
 			};
@@ -48,7 +53,7 @@ extern int slider_tx_pending;
  *	      wish to reuse it!
  *	@return The opcode, or 0 if a complete request is not yet received.
  */
-uint8_t sliderserial_readreq();//读取数据
+uint8_t sliderserial_readreq(); // 读取数据
 
 /**
  *	Send response to host
@@ -59,6 +64,6 @@ uint8_t sliderserial_readreq();//读取数据
  *	@note This function is stateful! Carefully examine its implementation if you
  *	      wish to reuse it!
  */
-void sliderserial_writeresp();//写入数据
+void sliderserial_writeresp(); // 写入数据
 
 #endif
