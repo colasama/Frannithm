@@ -3,6 +3,7 @@
 #include "air.h"
 #include "touch.h"
 #include "config.h"
+#include "HID-Project.h"
 
 void setup() {
     // Start serial connection
@@ -12,7 +13,7 @@ void setup() {
         delay(10);
     }
     Serial.println("[INFO] Frannithm is starting up...");
-    
+    NKROKeyboard.begin();
     touchSetup();
     airSetup();
     airCalibrate();

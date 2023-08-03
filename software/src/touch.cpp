@@ -30,53 +30,14 @@ void touchSetup()
   Wire.setClock(800000); // I2C波特率
   Serial.println("[INFO] All MPR121 Connected!");
 }
-  
 
-
-// void getTouched() {
-//   // Get the currently touched pads
-//   currtouched = cap.touched();
-
-//   for (uint8_t i=0; i<12; i++) {
-//     // it if *is* touched and *wasnt* touched before, alert!
-//     if ((currtouched & _BV(i)) && !(lasttouched & _BV(i)) ) {
-//       Serial.print(i); Serial.println(" touched");
-//     }
-//     // if it *was* touched and now *isnt*, alert!
-//     if (!(currtouched & _BV(i)) && (lasttouched & _BV(i)) ) {
-//       Serial.print(i); Serial.println(" released");
-//     }
-//   }
-
-//   // reset our state
-//   lasttouched = currtouched;
-
-//   // comment out this line for detailed data from the sensor!
-//   return;
-
-//   // debugging info, what
-//   Serial.print("\t\t\t\t\t\t\t\t\t\t\t\t\t 0x"); Serial.println(cap.touched(), HEX);
-//   Serial.print("Filt: ");
-//   for (uint8_t i=0; i<12; i++) {
-//     Serial.print(cap.filteredData(i)); Serial.print("\t");
-//   }
-//   Serial.println();
-//   Serial.print("Base: ");
-//   for (uint8_t i=0; i<12; i++) {
-//     Serial.print(cap.baselineData(i)); Serial.print("\t");
-//   }
-//   Serial.println();
-
-//   // put a delay so it isn't overwhelming
-//   delay(100);
-// }
-
-// 直连触摸函数部分//
-int calCheck(int bl, int fd) { // 触摸数值计算
+// 触摸数值计算
+int calCheck(int bl, int fd) { 
   int cal = bl - fd;
   return cal > 4 ? 5 * cal : (cal > 0 ? cal : 0);
 }
 
+// 触摸检测
 void touchLoop() {
   int16_t bl, fl, cal, calpress[32];
 
@@ -105,10 +66,9 @@ void touchLoop() {
   {
     uint8_t calkeypress = calpress[i];
     // Serial.println(calpress[i]);
-    if (calkeypress >= SLIDER_THRESHOLDS)
-    { // Check
+    if (calkeypress >= TOUCH_THRESHOLD)
+    {
       checkRelease[i] = SLIDER_CMD_AUTO_SCAN;
-      // Serial.print("[DEBUG] Press Key: ");
       NKROKeyboard.press(KeyCode[i]);
     }
     else
@@ -126,28 +86,26 @@ void touchLoop() {
 }
 
 void touchDebugLoop() {
-  int16_t testA[12], testB[12], testC[12];
-  int16_t testAF[12], testBF[12], testCF[12];
-
+  int16_t debugBaseline[32], debugFiltered[32];
   int16_t cal, calpress[32];
 
   // 注意：FRAN 台 v1 的键位是反的
   for (uint8_t i = 0; i < 12; i++)
   { // 计算数值
-    testA[i] = capA.baselineData(i);
-    testAF[i] = capA.filteredData(i);
-    cal = calCheck(testA[i], testAF[i]);
+    debugBaseline[i] = capA.baselineData(i);
+    debugFiltered[i] = capA.filteredData(i);
+    cal = calCheck(debugBaseline[i], debugFiltered[i]);
     calpress[i] = CLAMP(cal, 0, 255);
 
-    testB[i] = capB.baselineData(i);
-    testBF[i] = capB.filteredData(i);
-    cal = calCheck(testB[i], testBF[i]);
+    debugBaseline[i + 12] = capB.baselineData(i);
+    debugFiltered[i + 12] = capB.filteredData(i);
+    cal = calCheck(debugBaseline[i], debugFiltered[i]);
     calpress[i + 12] = CLAMP(cal, 0, 255);
     if (i >= 4)
     {
-      testC[i] = capC.baselineData(i);
-      testCF[i] = capC.filteredData(i);
-      cal = calCheck(testC[i], testCF[i]);
+      debugBaseline[i + 20] = capC.baselineData(i);
+      debugFiltered[i + 20] = capC.filteredData(i);
+      cal = calCheck(debugBaseline[i], debugFiltered[i]);
       calpress[i + 20] = CLAMP(cal, 0, 255);
     }
   }
@@ -163,9 +121,9 @@ void touchDebugLoop() {
     Serial.print("A");
     Serial.print(i);
     Serial.print("\tB");
-    Serial.print(testA[i]);
+    Serial.print(debugBaseline[i]);
     Serial.print("F");
-    Serial.print(testAF[i]);
+    Serial.print(debugFiltered[i]);
     Serial.print("\t");
   }
   Serial.println();
@@ -173,9 +131,9 @@ void touchDebugLoop() {
     Serial.print("B");
     Serial.print(i);
     Serial.print("\tB");
-    Serial.print(testB[i]);
+    Serial.print(debugBaseline[i + 12]);
     Serial.print("F");
-    Serial.print(testBF[i]);
+    Serial.print(debugFiltered[i + 12]);
     Serial.print("\t");
   }
   Serial.println();
@@ -183,9 +141,9 @@ void touchDebugLoop() {
     Serial.print("C");
     Serial.print(i);
     Serial.print("\tB");
-    Serial.print(testC[i]);
+    Serial.print(debugBaseline[i + 20]);
     Serial.print("F");
-    Serial.print(testCF[i]);
+    Serial.print(debugFiltered[i + 20]);
     Serial.print("\t");
   }
   Serial.println();

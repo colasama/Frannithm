@@ -11,7 +11,7 @@
 #define MPR121CONF_DT 2 ///< 按下样本采集数
 // AFE Configurations
 #define MPR121CONF_FFI  MPR121_FFI_6 ///< 一层过滤采样数
-#define MPR121CONF_CDC  16 ///< 充放电电流
+#define MPR121CONF_CDC  0x3F ///< 充放电电流
 #define MPR121CONF_CDT  MPR121_CDT_500NS ///< 充放电时间
 #define MPR121CONF_SFI  MPR121_SFI_4 ///< 二层过滤
 #define MPR121CONF_ESI  MPR121_ESI_1MS ///< 二层过滤采样间隔时间

@@ -1,15 +1,15 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
-// Air Keys
-// #define AIR_KEY_0 KEYPAD_0
-// #define AIR_KEY_1 KEYPAD_1
-// #define AIR_KEY_2 KEYPAD_2
-// #define AIR_KEY_3 KEYPAD_3
-// #define AIR_KEY_4 KEYPAD_4
-// #define AIR_KEY_5 KEYPAD_5
+// 天键键值
+#define AIR_KEY_0 KEYPAD_DIVIDE
+#define AIR_KEY_1 KEYPAD_MULTIPLY
+#define AIR_KEY_2 KEYPAD_SUBTRACT
+#define AIR_KEY_3 KEYPAD_ADD
+#define AIR_KEY_4 KEY_SEMICOLON
+#define AIR_KEY_5 KEY_QUOTE
 
-// Air PIN in Pro Micro
+// Pro Micro 中的发射引脚
 #define AIR_TX_PIN_0 5
 #define AIR_TX_PIN_1 A7
 #define AIR_TX_PIN_2 7
@@ -19,6 +19,7 @@
 #define AIR_TX_PIN_4 14
 #define AIR_TX_PIN_5 15
 
+// Pro Micro 中的接收引脚
 #define AIR_RX_PIN_0 A3
 #define AIR_RX_PIN_1 A2
 #define AIR_RX_PIN_2 A1
@@ -41,5 +42,6 @@
 #define CB_ADDR 0x5B
 #define CC_ADDR 0x5C
 
-#define SLIDER_THRESHOLDS 96        // 默认触摸触发阈值，越低越灵敏
+#define TOUCH_THRESHOLD 96        // 默认触摸触发阈值，越低越灵敏
+
 #endif
