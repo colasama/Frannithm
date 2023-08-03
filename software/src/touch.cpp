@@ -2,8 +2,7 @@
 
 static MPR121 capA, capB, capC; // mpr121定义
 uint8_t checkRelease[32];
-// 阈值
-uint8_t val = 128;
+
 ////按键定义////
 KeyboardKeycode KeyCode[32] = {//键值列表
    KEY_I, KEY_COMMA, KEY_8, KEY_K, KEY_U, KEY_M, KEY_7, KEY_J, KEY_Y, KEY_N,
@@ -106,7 +105,7 @@ void touchLoop() {
   {
     uint8_t calkeypress = calpress[i];
     // Serial.println(calpress[i]);
-    if (calkeypress >= val)
+    if (calkeypress >= SLIDER_THRESHOLDS)
     { // Check
       checkRelease[i] = SLIDER_CMD_AUTO_SCAN;
       // Serial.print("[DEBUG] Press Key: ");

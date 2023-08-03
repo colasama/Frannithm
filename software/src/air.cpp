@@ -1,13 +1,18 @@
 #include "air.h"
+#include "HID-Project.h"
 
 ////Air定义////
 int calibrationCounter;
 bool calibrated;
-uint16_t thresholds[6];
-uint16_t maxReadings[6];
+int thresholds[6];
+int maxReadings[6];
 
-uint8_t AirState[6];
+int AirState[6];
 
+////按键定义////
+KeyboardKeycode AIR_KEYS[6] = {//键值列表
+   KEYPAD_DIVIDE, KEYPAD_MULTIPLY, KEYPAD_SUBTRACT, KEYPAD_ADD, KEY_SEMICOLON, KEY_QUOTE
+   }; 
 //////////Air//////////
 void airSetup()
 {
@@ -15,6 +20,7 @@ void airSetup()
   for (int i = 0; i < 6; i++)
   {
     maxReadings[i] = 0;
+    thresholds[i] = 0;
   }
   for (int i = 0; i < 6; i++)
   {
@@ -60,7 +66,7 @@ void changeLight(int light)
   }
 }
 
-uint16_t getValue(int sensor)
+int getValue(int sensor)
 {                                         // 获取开灯数值函数
   changeLight(sensor);                    // 开灯
   delayMicroseconds(AIR_LED_DELAY / 2);   // 加上延迟保证完全开启
@@ -91,12 +97,13 @@ bool getSensorState(int sensor)
   //  Serial.println();
 
   // 把读数减去环境数值和校准数值比较后返回布尔值，+200为防止负数的比较
-  return (value - enviroment + 200) < (thresholds[sensor] + 200);
+  return (enviroment - value + 200) < (thresholds[sensor] + 200);
 }
 
 void airCalibrate()
 { // 校准接收端
   // 跳过开头采样
+  Serial.println("[INFO] Air keys are calibrating...");
   for (int i = 0; i < SKIP_SAMPLES; i++)
   {
     for (int sensor = 0; sensor < 6; sensor++)
@@ -113,17 +120,29 @@ void airCalibrate()
       turnOffLight();                                   // 关灯
       delayMicroseconds(AIR_LED_DELAY / 2);             // 加上延迟保证完全关闭
       int enviroment = analogRead(AIR_RX_PINS[sensor]); // 读取环境数值
-      int value = getValue(sensor) - enviroment;        // 读取开灯数值
+      int value = enviroment - getValue(sensor);
       if (value > maxReadings[sensor])                  // 记录最高读数
         maxReadings[sensor] = value;
+      // Serial.print("V: ");
+      // Serial.print(value);
+      // Serial.print("\tMAX: ");
+      // Serial.println(maxReadings[sensor]);
     }
-    Serial.println();
   }
+  
+  Serial.print("[INFO] Calibrated MaxReadings: ");
+  for(int i = 0; i < 6; i++) {
+    Serial.print(maxReadings[i]);
+    Serial.print(" ");
+  }
+  Serial.println();
+
   for (int i = 0; i < 6; i++)
   { // 通过敏感度生成阈值
     thresholds[i] = (AIR_INPUT_SENSITIVITY * maxReadings[i]);
   }
   calibrated = true; // 完成校准
+  Serial.println("[INFO] Air keys calibrated!");
 }
 
 void airLoop()
