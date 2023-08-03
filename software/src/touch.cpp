@@ -62,6 +62,8 @@ void touchLoop() {
     }
   }
   
+  // FRAN台v1 需要单独校准 A0
+  
   for (uint8_t i = 0; i < 32; i++)
   {
     uint8_t calkeypress = calpress[i];
@@ -85,7 +87,7 @@ void touchLoop() {
   }
 }
 
-void touchDebugLoop() {
+void touchDebug() {
   int16_t debugBaseline[32], debugFiltered[32];
   int16_t cal, calpress[32];
 
@@ -99,13 +101,13 @@ void touchDebugLoop() {
 
     debugBaseline[i + 12] = capB.baselineData(i);
     debugFiltered[i + 12] = capB.filteredData(i);
-    cal = calCheck(debugBaseline[i], debugFiltered[i]);
+    cal = calCheck(debugBaseline[i + 12], debugFiltered[i + 12]);
     calpress[i + 12] = CLAMP(cal, 0, 255);
     if (i >= 4)
     {
       debugBaseline[i + 20] = capC.baselineData(i);
       debugFiltered[i + 20] = capC.filteredData(i);
-      cal = calCheck(debugBaseline[i], debugFiltered[i]);
+      cal = calCheck(debugBaseline[i + 20], debugFiltered[i + 20]);
       calpress[i + 20] = CLAMP(cal, 0, 255);
     }
   }

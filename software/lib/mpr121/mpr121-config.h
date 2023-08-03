@@ -16,7 +16,7 @@
 #define MPR121CONF_SFI  MPR121_SFI_4 ///< 二层过滤
 #define MPR121CONF_ESI  MPR121_ESI_1MS ///< 二层过滤采样间隔时间
 // ECR Configurations
-#define MPR121CONF_CL   MPR121_CL_INIT1 ///< 启用基线动态校准
+#define MPR121CONF_CL   MPR121_CL_NONE ///< 启用基线动态校准
 #define MPR121CONF_ELEPROX  MPR121_ELEPROX_0  ///< 接近检测电极，禁用
 #define MPR121CONF_ELE    12 ///< touch detection electrodes
 // 基线动态校准

@@ -8,10 +8,7 @@
 void setup() {
     // Start serial connection
     Serial.begin(115200);
-    Serial.setTimeout(0);
-    while (!Serial) { // needed to keep leonardo/micro from starting too fast!
-        delay(10);
-    }
+    Serial.setTimeout(0);//******** /**/
     Serial.println("[INFO] Frannithm is starting up...");
     NKROKeyboard.begin();
     touchSetup();
@@ -21,6 +18,7 @@ void setup() {
 
 void loop() {
 	// airDebug();
-    airLoop();
+    airLoop(); 
+    // touchDebug();
     touchLoop();
 }

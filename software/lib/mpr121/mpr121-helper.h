@@ -91,7 +91,7 @@
 #define MPR121_CL_NONE	0
 #define MPR121_CL_LOCK	1
 #define MPR121_CL_INIT1	2
-#define MPR121_CL_INTI2	3
+#define MPR121_CL_INIT2	3
 
 #define MPR121_ELEPROX_0	0
 #define MPR121_ELEPROX_2	1
