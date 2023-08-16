@@ -18,7 +18,7 @@ void setup() {
 
 void loop() {
 	// airDebug();
-    airLoop(); 
-    // touchDebug();
-    touchLoop();
+    // airLoop(); 
+    touchDebug();
+    // touchLoop();
 }

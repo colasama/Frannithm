@@ -1,6 +1,8 @@
 #include "touch.h"
 
-static MPR121 capA, capB, capC; // mpr121定义
+Adafruit_MPR121 capA = Adafruit_MPR121();
+Adafruit_MPR121 capB = Adafruit_MPR121();
+Adafruit_MPR121 capC = Adafruit_MPR121();
 uint8_t checkRelease[32];
 
 ////按键定义////
@@ -16,16 +18,8 @@ void touchSetup()
   // Default address is 0x5A, if tied to 3.3V its 0x5B
   // If tied to SDA its 0x5C and if SCL then 0x5D
   capA.begin(CA_ADDR);
-  capA.init();
-  capA.run();
-
   capB.begin(CB_ADDR);
-  capB.init();
-  capB.run();
-
   capC.begin(CC_ADDR);
-  capC.init();
-  capC.run();
 
   Wire.setClock(800000); // I2C波特率
   Serial.println("[INFO] All MPR121 Connected!");

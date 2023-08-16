@@ -29,7 +29,7 @@
 #include "Adafruit_MPR121.h"
 
 // uncomment to use autoconfig !
-//#define AUTOCONFIG // use autoconfig (Yes it works pretty well!)
+#define AUTOCONFIG // use autoconfig (Yes it works pretty well!)
 
 /*!
  *  @brief      Default constructor
@@ -78,30 +78,30 @@ bool Adafruit_MPR121::begin(uint8_t i2caddr, TwoWire *theWire,
 
   setThresholds(touchThreshold, releaseThreshold);
   writeRegister(MPR121_MHDR, 0x01);
-  writeRegister(MPR121_NHDR, 0x01);
-  writeRegister(MPR121_NCLR, 0x0E);
+  writeRegister(MPR121_NHDR, 0x02);
+  writeRegister(MPR121_NCLR, 0x01);
   writeRegister(MPR121_FDLR, 0x00);
 
-  writeRegister(MPR121_MHDF, 0x01);
-  writeRegister(MPR121_NHDF, 0x05);
-  writeRegister(MPR121_NCLF, 0x01);
-  writeRegister(MPR121_FDLF, 0x00);
+  writeRegister(MPR121_MHDF, 0x3F);
+  writeRegister(MPR121_NHDF, 0x3F);
+  writeRegister(MPR121_NCLF, 0x3F);
+  writeRegister(MPR121_FDLF, 0x06);
 
   writeRegister(MPR121_NHDT, 0x00);
   writeRegister(MPR121_NCLT, 0x00);
   writeRegister(MPR121_FDLT, 0x00);
 
-  writeRegister(MPR121_DEBOUNCE, 0);
-  writeRegister(MPR121_CONFIG1, 0x10); // default, 16uA charge current
+  writeRegister(MPR121_DEBOUNCE, 0x01);
+  writeRegister(MPR121_CONFIG1, 0x3F); // default, 16uA charge current
   writeRegister(MPR121_CONFIG2, 0x20); // 0.5uS encoding, 1ms period
 
 #ifdef AUTOCONFIG
-  writeRegister(MPR121_AUTOCONFIG0, 0x0B);
-
+  writeRegister(MPR121_AUTOCONFIG0, 0x1B);
+  writeRegister(MPR121_AUTOCONFIG1, 0x00);
   // correct values for Vdd = 3.3V
-  writeRegister(MPR121_UPLIMIT, 200);     // ((Vdd - 0.7)/Vdd) * 256
-  writeRegister(MPR121_TARGETLIMIT, 180); // UPLIMIT * 0.9
-  writeRegister(MPR121_LOWLIMIT, 130);    // UPLIMIT * 0.65
+  writeRegister(MPR121_UPLIMIT, 202);     // ((Vdd - 0.7)/Vdd) * 256
+  writeRegister(MPR121_TARGETLIMIT, 181); // UPLIMIT * 0.9
+  writeRegister(MPR121_LOWLIMIT, 131);    // UPLIMIT * 0.65
 #endif
 
   // enable X electrodes and start MPR121

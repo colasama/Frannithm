@@ -1,6 +1,7 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
+
 // 天键键值
 #define AIR_KEY_0 KEYPAD_DIVIDE
 #define AIR_KEY_1 KEYPAD_MULTIPLY
@@ -42,6 +43,6 @@
 #define CB_ADDR 0x5B
 #define CC_ADDR 0x5C
 
-#define TOUCH_THRESHOLD 45        // 默认触摸触发阈值，越低越灵敏
+#define TOUCH_THRESHOLD 45          // 默认触摸触发阈值，越低越灵敏
 
 #endif
