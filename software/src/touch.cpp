@@ -1,13 +1,15 @@
 #include "touch.h"
 
+USBHIDKeyboard touchKeyboard;
 static MPR121 capA, capB, capC; // mpr121定义
 uint8_t checkRelease[32];
+std::map<uint8_t, int> PKEYS;
 
 ////按键定义////
-KeyboardKeycode KeyCode[32] = {//键值列表
-   KEY_I, KEY_COMMA, KEY_8, KEY_K, KEY_U, KEY_M, KEY_7, KEY_J, KEY_Y, KEY_N,
-   KEY_6, KEY_H, KEY_T, KEY_B, KEY_5, KEY_G, KEY_R, KEY_V, KEY_4, KEY_F, KEY_E, KEY_C,  
-   KEY_3, KEY_D, KEY_W, KEY_X, KEY_2, KEY_S, KEY_Q, KEY_Z, KEY_1, KEY_A,
+char KeyCode[32] = {// 键值列表
+  '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f',
+  'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p',
+  'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', ',', '.',
    }; 
 
 // Init the touch part
@@ -26,9 +28,10 @@ void touchSetup()
   capC.begin(CC_ADDR);
   capC.init();
   capC.run();
-
-  Wire.setClock(800000); // I2C波特率
+  Wire.setClock(3400000);
+  // Wire.setClock(800000); // I2C波特率
   Serial.println("[INFO] All MPR121 Connected!");
+  touchKeyboard.begin();
 }
 
 // 触摸数值计算
@@ -69,8 +72,12 @@ void touchLoop() {
     // Serial.println(calpress[i]);
     if (calkeypress >= TOUCH_THRESHOLD)
     {
-      checkRelease[i] = SLIDER_CMD_AUTO_SCAN;
-      NKROKeyboard.press(KeyCode[i]);
+      // checkRelease[i] = SLIDER_CMD_AUTO_SCAN;
+      checkRelease[i] = 1;
+      // NKROKeyboard.press(KeyCode[i]);
+      touchKeyboard.addKey(KeyCode[i]);
+      touchKeyboard.sendKey();
+      PKEYS[KeyCode[i]]++;
     }
     else
     {
@@ -79,7 +86,12 @@ void touchLoop() {
         checkRelease[i] = 0;
         // Serial.print("[DEBUG] Release Key: ");
         // Serial.println(i);
-        NKROKeyboard.release(KeyCode[i]);
+        // NKROKeyboard.release(KeyCode[i]);
+        PKEYS[KeyCode[i]]--;
+        if (!(PKEYS[KeyCode[i]])) {
+            touchKeyboard.delKey(KeyCode[i]);
+            touchKeyboard.sendKey();
+        }
       }
       continue;
     }

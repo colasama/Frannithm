@@ -1,13 +1,13 @@
 #include "air.h"
-#include "HID-Project.h"
 
+USBHIDKeyboard airKeyboard;
 bool calibrated;
 int thresholds[6];
 int maxReadings[6];
 
 int AirState[6];
 
-KeyboardKeycode AIR_KEYS[6] = { // 键值列表
+char AIR_KEYS[6] = { // 键值列表
     AIR_KEY_0, AIR_KEY_1, AIR_KEY_2, AIR_KEY_3, AIR_KEY_4, AIR_KEY_5};
 
 // 初始化天键
@@ -20,6 +20,7 @@ void airSetup() {
     pinMode(AIR_TX_PINS[i], OUTPUT);
     AirState[i] = 0;
   }
+  airKeyboard.begin();
 }
 
 void turnOffLight() { // 关闭发射函数
@@ -97,11 +98,15 @@ void airLoop() {
   if (calibrated) {
     for (int i = 0; i < 6; i++) {
       if (getSensorState(i)) {
-        NKROKeyboard.press(AIR_KEYS[i]);
+        // NKROKeyboard.press(AIR_KEYS[i]);
+        airKeyboard.addKey(AIR_KEYS[i]);
+        airKeyboard.sendKey();
         AirState[i] = 1;
       }
       else if (!getSensorState(i)) {
-        NKROKeyboard.release(AIR_KEYS[i]);
+        // NKROKeyboard.release(AIR_KEYS[i]);
+        airKeyboard.delKey(AIR_KEYS[i]);
+        airKeyboard.sendKey();
         AirState[i] = 0;
       }
     }

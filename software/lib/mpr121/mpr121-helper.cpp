@@ -60,7 +60,7 @@
 void MPR121::begin(uint8_t addr, TwoWire *wire) {
   _i2caddr = addr;
   _wire = wire;
-  _wire->begin();
+  _wire->begin(35, 37);
 }
 
 void MPR121::init() {
