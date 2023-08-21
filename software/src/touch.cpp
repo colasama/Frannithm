@@ -63,7 +63,6 @@ void touchLoop() {
   }
   
   // FRAN台v1 需要单独校准 A0
-  
   for (uint8_t i = 0; i < 32; i++)
   {
     uint8_t calkeypress = calpress[i];

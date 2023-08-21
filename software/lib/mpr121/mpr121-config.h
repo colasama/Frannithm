@@ -4,11 +4,11 @@
 #include "mpr121-helper.h"
 
 // Thresholds
-#define MPR121CONF_TTH  6///< 触发阈值
-#define MPR121CONF_RTH  3///< 释放阈值
+#define MPR121CONF_TTH  32///< 触发阈值
+#define MPR121CONF_RTH  32///< 释放阈值
 // De-bounce     
 #define MPR121CONF_DR 4 ///< 松开样本采集数
-#define MPR121CONF_DT 2 ///< 按下样本采集数
+#define MPR121CONF_DT 0 ///< 按下样本采集数
 // AFE Configurations
 #define MPR121CONF_FFI  MPR121_FFI_6 ///< 一层过滤采样数
 #define MPR121CONF_CDC  0x3F ///< 充放电电流
@@ -16,14 +16,14 @@
 #define MPR121CONF_SFI  MPR121_SFI_4 ///< 二层过滤
 #define MPR121CONF_ESI  MPR121_ESI_1MS ///< 二层过滤采样间隔时间
 // ECR Configurations
-#define MPR121CONF_CL   MPR121_CL_NONE ///< 启用基线动态校准
+#define MPR121CONF_CL   MPR121_CL_INIT1 ///< 启用基线动态校准
 #define MPR121CONF_ELEPROX  MPR121_ELEPROX_0  ///< 接近检测电极，禁用
 #define MPR121CONF_ELE    12 ///< touch detection electrodes
 // 基线动态校准
 #define MPR121CONF_MHDR 1 ///< 上升最大变化值
 #define MPR121CONF_NHDR 8 ///< 上升幅度
-#define MPR121CONF_NCLR 1 ///< 上升修正样本个数
-#define MPR121CONF_FDLR 0 ///< 修正前等待样本个数
+#define MPR121CONF_NCLR 16 ///< 上升修正样本个数/
+#define MPR121CONF_FDLR 2 ///< 修正前等待样本个数
 #define MPR121CONF_MHDF 1 ///< 下降最大变化值
 #define MPR121CONF_NHDF 1 ///< 下降幅度
 #define MPR121CONF_NCLF 16  ///< 下降修正样本个数
