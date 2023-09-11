@@ -1,3 +1,6 @@
+#ifndef TOUCH_H
+#define TOUCH_H
+
 #include "config.h"
 // 调试用库
 // #include "Adafruit_MPR121.h"
@@ -13,3 +16,5 @@
 void touchSetup();
 void touchLoop();
 void touchDebug();
+
+#endif

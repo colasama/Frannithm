@@ -1,3 +1,5 @@
+#ifndef AIR_H
+#define AIR_H
 #include "config.h"
 #include <Arduino.h>
 #include <SimpleKalmanFilter.h>
@@ -11,3 +13,5 @@ void airSetup();
 void airCalibrate();
 void airLoop();
 void airDebug();
+
+#endif
