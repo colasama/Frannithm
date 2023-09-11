@@ -30,7 +30,7 @@ void turnOffLight() { // 关闭发射函数
 
 // 红外发射轮询
 void changeLight(int light) {
-  if(light >= 0 && light <= 5) {
+  if(light >= 0 && light < 6) {
     digitalWrite(AIR_TX_PINS[light], HIGH);
   } else {
     turnOffLight();
@@ -56,6 +56,7 @@ bool getSensorState(int sensor) {
 }
 
 void airCalibrate() { // 校准接收端
+  delay(2000);
   // 跳过开头采样
   Serial.println("[INFO] Air keys are calibrating...");
   for (int i = 0; i < SKIP_SAMPLES; i++) {
@@ -70,7 +71,14 @@ void airCalibrate() { // 校准接收端
       turnOffLight();                                   // 关灯
       delayMicroseconds(AIR_LED_DELAY / 2);             // 加上延迟保证完全关闭
       int enviroment = analogRead(AIR_RX_PINS[sensor]); // 读取环境数值
+      
       int value = enviroment - getValue(sensor);
+      // if(sensor == 5) {
+      //   Serial.print("Env 5:");
+      //   Serial.print(enviroment);
+      //   Serial.print("\t Val: ");
+      //   Serial.println(getValue(sensor));
+      // }----
       // 记录最高读数
       if (value > maxReadings[sensor]) {
         maxReadings[sensor] = value;
@@ -95,7 +103,8 @@ void airCalibrate() { // 校准接收端
 // 天键检测
 void airLoop() {
   if (calibrated) {
-    for (int i = 0; i < 6; i++) {
+    // TODO: 暂时封印住第六颗 LED
+    for (int i = 0; i < 5; i++) {
       if (getSensorState(i)) {
         NKROKeyboard.press(AIR_KEYS[i]);
         AirState[i] = 1;

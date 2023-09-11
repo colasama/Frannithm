@@ -31,7 +31,7 @@ void setup() {
 void loop() {
 	// airDebug();
     airLoop();
-    // touchDebug();；‘
+    // touchDebug();
     #ifdef ENABLE_SERIAL_MODE
     serialTouchLoop();
     #else

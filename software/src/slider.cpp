@@ -4,7 +4,7 @@
 static MPR121 capA, capB, capC; // mpr121定义
 uint8_t checkLed = 0;
 bool autoScan = false;
-int keyMapForFranV1[32] = {11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0, 23, 22, 21, 20, 19, 18, 17, 16, 15, 14, 13, 12, 31, 30, 29, 28, 27, 26, 25, 24};
+int keyMapForFranV1[32] = {10, 11, 8, 9, 6, 7, 4, 5, 2, 3, 0, 1, 22, 23, 20, 21, 18, 19, 16, 17, 14, 15, 12, 13, 30, 31, 28, 29, 26, 27, 24, 25};
 // Init the touch part
 void serialTouchSetup()
 {
