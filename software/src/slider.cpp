@@ -22,7 +22,7 @@ void serialTouchSetup()
   capC.init();
   capC.run();
 
-  Wire.setClock(800000); // I2C波特率
+  Wire.setClock(400000); // I2C波特率
   Serial.println("[INFO] Serial Mode, All MPR121 Connected!");
 }
 
