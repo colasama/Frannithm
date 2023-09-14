@@ -125,30 +125,29 @@ void sliderScan() {
   slider_resp.cmd = SLIDER_CMD_AUTO_SCAN;
   slider_resp.size = sizeof(slider_resp.pressure);
   int16_t bv, fd, pressure;
-  int16_t pressures[32];
   for (uint8_t i = 0; i < 12; i++)
   { // 计算数值
     bv = capA.baselineData(i);
     fd = capA.filteredData(i);
     pressure = calTouch(bv, fd);
-    pressures[i] = CLAMP(pressure, 0, 255);
+    slider_resp.pressure[keyMapForFranV1[31 - i]] = CLAMP(pressure, 0, 255);
 
     bv = capB.baselineData(i);
     fd = capB.filteredData(i);
     pressure = calTouch(bv, fd);
-    pressures[i + 12] = CLAMP(pressure, 0, 255);
+    slider_resp.pressure[keyMapForFranV1[19 - i]] = CLAMP(pressure, 0, 255);
     if (i >= 4)
     {
       bv = capC.baselineData(i);
       fd = capC.filteredData(i);
       pressure = calTouch(bv, fd);
-      pressures[i + 20] = CLAMP(pressure, 0, 255);
+      slider_resp.pressure[keyMapForFranV1[11 - i]] = CLAMP(pressure, 0, 255);
     }
   }
   // 键值重映射
-  for(uint8_t i = 0; i < 32; i++) {
-    slider_resp.pressure[i] = pressures[keyMapForFranV1[31 - i]];
-  }
+  // for(uint8_t i = 0; i < 32; i++) {
+  //   slider_resp.pressure[i] = pressures[keyMapForFranV1[31 - i]];
+  // }
   // aircheck();//air检测
   // air_rgb_Serial();
 }
