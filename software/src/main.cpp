@@ -12,13 +12,14 @@ void setup() {
     Serial.println("[INFO] Frannithm is starting up...");
     NKROKeyboard.begin();
     touchSetup();
-    airSetup();
-    airCalibrate();
+    // airSetup();
+    // airCalibrate();
 }
 
 void loop() {
 	// airDebug();
-    airLoop(); 
-    // touchDebug();
-    touchLoop();
+    // airLoop(); 
+    touchDebug();
+    // touchDebug2();
+    // touchLoop();
 }

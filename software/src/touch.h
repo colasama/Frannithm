@@ -13,3 +13,4 @@
 void touchSetup();
 void touchLoop();
 void touchDebug();
+void touchDebug2();
