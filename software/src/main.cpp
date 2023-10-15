@@ -10,6 +10,12 @@ void setup() {
     Serial.begin(115200);
     Serial.setTimeout(0);//******** /**/
     Serial.println("[INFO] Frannithm is starting up...");
+    // 先等待5秒再开始校准
+    for(int i=0; i<5; i++) {
+        digitalWrite(LED_BUILTIN_RX, HIGH);
+        delay(1000);
+        digitalWrite(LED_BUILTIN_RX, LOW);
+    }
     NKROKeyboard.begin();
     touchSetup();
     airSetup();
