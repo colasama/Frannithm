@@ -12,4 +12,5 @@
 
 void touchSetup();
 void touchLoop();
+void touchLoopNew();
 void touchDebug();

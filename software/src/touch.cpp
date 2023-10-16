@@ -37,6 +37,49 @@ int calCheck(int bl, int fd) {
   return cal > 4 ? 5 * cal : (cal > 0 ? cal : 0);
 }
 
+// 新款触摸检测
+void touchLoopNew() {
+  uint16_t curTouched[] = {
+    capA.touched(),
+    capB.touched(),
+    capC.touched()
+  };
+  uint16_t lastTouched[3] = {0, 0, 0};
+
+  for (uint8_t i = 0; i < 12; i++) {
+    // it if *is* touched and *wasnt* touched before, alert!
+    if ((curTouched[0] & _BV(i)) && !(lastTouched[0] & _BV(i)) ) {
+      Serial.print("A按下：");
+      Serial.println(i);
+    }
+    if ((curTouched[1] & _BV(i)) && !(lastTouched[1] & _BV(i)) ) {
+      Serial.print("B按下：");
+      Serial.println(i);
+    }
+    if ((curTouched[2] & _BV(i)) && !(lastTouched[2] & _BV(i)) && i > 4) {
+      Serial.print("C按下：");
+      Serial.println(i);
+    }
+    // if it *was* touched and now *isnt*, alert!
+    if (!(curTouched[0] & _BV(i)) && (lastTouched[0] & _BV(i)) ) {
+      Serial.print("A松开：");
+      Serial.println(i);
+    }
+    if (!(curTouched[1] & _BV(i)) && (lastTouched[1] & _BV(i)) ) {
+      Serial.print("B松开：");
+      Serial.println(i);
+    }
+    if (!(curTouched[2] & _BV(i)) && (lastTouched[2] & _BV(i)) && i > 4) {
+      Serial.print("C松开：");
+      Serial.println(i);
+    }
+  }
+
+  lastTouched[0] = curTouched[0];
+  lastTouched[1] = curTouched[1];
+  lastTouched[2] = curTouched[2];
+}
+
 // 触摸检测
 void touchLoop() {
   int16_t bl, fl, cal, calpress[32];
