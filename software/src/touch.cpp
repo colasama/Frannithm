@@ -49,34 +49,22 @@ void touchLoopNew() {
   for (uint8_t i = 0; i < 12; i++) {
     // it if *is* touched and *wasnt* touched before, alert!
     if ((curTouched[0] & _BV(i)) && !(lastTouched[0] & _BV(i)) ) {
-      // Serial.print("A按下：");
-      // Serial.println(i);
       NKROKeyboard.press(KeyCode[i]);
     }
     if ((curTouched[1] & _BV(i)) && !(lastTouched[1] & _BV(i)) ) {
-      // Serial.print("B按下：");
-      // Serial.println(i);
       NKROKeyboard.press(KeyCode[i + 12]);
     }
     if ((curTouched[2] & _BV(i)) && !(lastTouched[2] & _BV(i))) {
-      // Serial.print("C按下：");
-      // Serial.println(i);
       NKROKeyboard.press(KeyCode[i + 20]);
     }
     // if it *was* touched and now *isnt*, alert!
     if (!(curTouched[0] & _BV(i)) && (lastTouched[0] & _BV(i)) ) {
-      // Serial.print("A松开：");
-      // Serial.println(i);
       NKROKeyboard.release(KeyCode[i]);
     }
     if (!(curTouched[1] & _BV(i)) && (lastTouched[1] & _BV(i)) ) {
-      // Serial.print("B松开：");
-      // Serial.println(i);
       NKROKeyboard.release(KeyCode[i + 12]);
     }
     if (!(curTouched[2] & _BV(i)) && (lastTouched[2] & _BV(i))) {
-      // Serial.print("C松开：");
-      // Serial.println(i);
       NKROKeyboard.release(KeyCode[i + 20]);
     }
   }
