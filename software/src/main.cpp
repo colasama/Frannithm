@@ -38,6 +38,7 @@ void loop() {
     airLoop(); 
     #ifdef ENABLE_SERIAL_MODE
     serialTouchLoop();
+    // slider/*Debug();
     #else
     touchLoopNew();
     // touchDebug();

@@ -3,13 +3,18 @@
 
 static Adafruit_MPR121 capA, capB, capC; // mpr121定义
 uint8_t checkLed = 0;
+
+uint16_t curTouchedSlider[3];
+uint16_t lastTouchedSlider[3] = {0, 0, 0};
+
 bool autoScan = false;
-int keyMapForFranV1[32] = {10, 11, 8, 9, 6, 7, 4, 5, 2, 3, 0, 1, 22, 23, 20, 21, 18, 19, 16, 17, 14, 15, 12, 13, 30, 31, 28, 29, 26, 27, 24, 25};
+int keyMapForFranV1[32] = {22, 21, 24, 23, 26, 25, 28, 27, 30, 29, 32, 31, 10, 9, 12, 11, 14, 13, 16, 15, 18, 17, 20, 19, 2, 1, 4, 3, 6, 5, 8, 7};
 // Init the touch part
 void serialTouchSetup()
 {
   // Default address is 0x5A, if tied to 3.3V its 0x5B
   // If tied to SDA its 0x5C and if SCL then 0x5D
+  Wire.setClock(800000); // I2C波特率
   if (!capA.begin(CA_ADDR)) {
     Serial.println("MPR121 A not found, check wiring?");
     while (1);
@@ -22,7 +27,7 @@ void serialTouchSetup()
     Serial.println("MPR121 C not found, check wiring?");
     while (1);
   }
-  Wire.setClock(400000); // I2C波特率
+  
   Serial.println("[INFO] Serial Mode, All MPR121 Connected!");
 }
 
@@ -126,7 +131,7 @@ void sliderScan() {
   slider_resp.cmd = SLIDER_CMD_AUTO_SCAN;
   slider_resp.size = sizeof(slider_resp.pressure);
 
-  uint16_t curTouched[] = {
+  uint16_t curTouchedSlider[] = {
     capA.touched(),
     capB.touched(),
     capC.touched()
@@ -134,36 +139,73 @@ void sliderScan() {
 
   for (uint8_t i = 0; i < 12; i++) {
     // it if *is* touched and *wasnt* touched before, alert!
-    if ((curTouched[0] & _BV(i)) && !(lastTouched[0] & _BV(i)) ) {
-      slider_resp.pressure[keyMapForFranV1[31 - i]] = 255;
+    if ((curTouchedSlider[0] & _BV(i)) && !(lastTouchedSlider[0] & _BV(i)) ) {
+      slider_resp.pressure[keyMapForFranV1[i] - 1] = 255;
     }
-    if ((curTouched[1] & _BV(i)) && !(lastTouched[1] & _BV(i)) ) {
-      slider_resp.pressure[keyMapForFranV1[19 - i]] = 255;
+    if ((curTouchedSlider[1] & _BV(i)) && !(lastTouchedSlider[1] & _BV(i)) ) {
+      slider_resp.pressure[keyMapForFranV1[i + 12] - 1] = 255;
     }
-    if ((curTouched[2] & _BV(i)) && !(lastTouched[2] & _BV(i))) {
+    if ((curTouchedSlider[2] & _BV(i)) && !(lastTouchedSlider[2] & _BV(i))) {
       if (i >= 4) {
-        slider_resp.pressure[keyMapForFranV1[11 - i]] = 255;
+        slider_resp.pressure[keyMapForFranV1[i + 20] - 1] = 255;
       }
     }
     // if it *was* touched and now *isnt*, alert!
-    if (!(curTouched[0] & _BV(i)) && (lastTouched[0] & _BV(i)) ) {
-      slider_resp.pressure[keyMapForFranV1[31 - i]] = 0;
+    if (!(curTouchedSlider[0] & _BV(i)) && (lastTouchedSlider[0] & _BV(i)) ) {
+      slider_resp.pressure[keyMapForFranV1[i] - 1] = 0;
     }
-    if (!(curTouched[1] & _BV(i)) && (lastTouched[1] & _BV(i)) ) {
-      slider_resp.pressure[keyMapForFranV1[19 - i]] = 0;
+    if (!(curTouchedSlider[1] & _BV(i)) && (lastTouchedSlider[1] & _BV(i)) ) {
+      slider_resp.pressure[keyMapForFranV1[i + 12] - 1] = 0;
     }
-    if (!(curTouched[2] & _BV(i)) && (lastTouched[2] & _BV(i))) {
+    if (!(curTouchedSlider[2] & _BV(i)) && (lastTouchedSlider[2] & _BV(i))) {
       if (i >= 4) {
-        slider_resp.pressure[keyMapForFranV1[11 - i]] = 0;
+        slider_resp.pressure[keyMapForFranV1[i + 20] - 1] = 0;
+      }
+    }
+  }
+  lastTouchedSlider[0] = curTouchedSlider[0];
+  lastTouchedSlider[1] = curTouchedSlider[1];
+  lastTouchedSlider[2] = curTouchedSlider[2];
+}
+
+void sliderDebug() {
+  uint16_t curTouchedSlider[] = {
+    capA.touched(),
+    capB.touched(),
+    capC.touched()
+  };
+
+  for (uint8_t i = 0; i < 12; i++) {
+    // it if *is* touched and *wasnt* touched before, alert!
+    if ((curTouchedSlider[0] & _BV(i)) && !(lastTouchedSlider[0] & _BV(i)) ) {
+      Serial.print("A按下："); Serial.println(i);
+    }
+    if ((curTouchedSlider[1] & _BV(i)) && !(lastTouchedSlider[1] & _BV(i)) ) {
+      Serial.print("B按下："); Serial.println(i);
+    }
+    if ((curTouchedSlider[2] & _BV(i)) && !(lastTouchedSlider[2] & _BV(i))) {
+      if (i >= 4) {
+        Serial.print("C按下："); Serial.println(i);
+      }
+    }
+    // if it *was* touched and now *isnt*, alert!
+    if (!(curTouchedSlider[0] & _BV(i)) && (lastTouchedSlider[0] & _BV(i)) ) {
+      Serial.print("A松开："); Serial.println(i);
+    }
+    if (!(curTouchedSlider[1] & _BV(i)) && (lastTouchedSlider[1] & _BV(i)) ) {
+      Serial.print("B松开："); Serial.println(i);
+    }
+    if (!(curTouchedSlider[2] & _BV(i)) && (lastTouchedSlider[2] & _BV(i))) {
+      if (i >= 4) {
+        Serial.print("C松开："); Serial.println(i);
       }
     }
   }
 
-  lastTouched[0] = curTouched[0];
-  lastTouched[1] = curTouched[1];
-  lastTouched[2] = curTouched[2];
+  lastTouchedSlider[0] = curTouchedSlider[0];
+  lastTouchedSlider[1] = curTouchedSlider[1];
+  lastTouchedSlider[2] = curTouchedSlider[2];
 }
-
 // void sliderScan() {
 //   if (!autoScan || slider_tx_pending) {
 //     serialNotFound(); // serial尚未接到包头0xff时运行

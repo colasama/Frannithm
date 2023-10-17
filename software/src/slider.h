@@ -44,5 +44,6 @@ void sliderGetBoardInfo();
 void sliderGetBoardInfo();
 void sliderScan();
 void serialNotFound();
+void sliderDebug();
 int calTouch(int bv, int fd);
 #endif
