@@ -95,7 +95,7 @@ void airCalibrate() { // 校准接收端
 // 天键检测
 void airLoop() {
   if (calibrated) {
-    for (int i = 0; i < 6; i++) {
+    for (int i = 0; i < 5; i++) {
       if (getSensorState(i)) {
         NKROKeyboard.press(AIR_KEYS[i]);
         AirState[i] = 1;

@@ -10,6 +10,13 @@ KeyboardKeycode KeyCode[32] = {//键值列表
    KEY_3, KEY_D, KEY_W, KEY_X, KEY_2, KEY_S, KEY_Q, KEY_Z, KEY_1, KEY_A,
    }; 
 
+uint8_t TOUCH_THRESHOLD[32] = {
+  210, 45, 45, 45, 45, 45, 45, 45,
+  45, 45, 45, 45, 45, 45, 45, 45,
+  45, 45, 45, 45, 45, 45, 45, 45,
+  45, 45, 45, 45, 45, 45, 45, 45
+ };
+
 // Init the touch part
 void touchSetup()
 {
@@ -29,6 +36,7 @@ void touchSetup()
 
   Wire.setClock(800000); // I2C波特率
   Serial.println("[INFO] All MPR121 Connected!");
+
 }
 
 // 触摸数值计算
@@ -61,13 +69,19 @@ void touchLoop() {
       calpress[i + 20] = CLAMP(cal, 0, 255);
     }
   }
-  
+  // for (uint8_t i = 0; i < 32; i++) {
+  //   Serial.print(i);
+  //   Serial.print(": ");
+  //   Serial.print(calpress[i]);
+  //   Serial.print("\t");
+  // }
+  // Serial.println();
   // FRAN台v1 需要单独校准 A0
   for (uint8_t i = 0; i < 32; i++)
   {
     uint8_t calkeypress = calpress[i];
     // Serial.println(calpress[i]);
-    if (calkeypress >= TOUCH_THRESHOLD)
+    if (calkeypress >= TOUCH_THRESHOLD[i])
     {
       checkRelease[i] = SLIDER_CMD_AUTO_SCAN;
       NKROKeyboard.press(KeyCode[i]);
