@@ -1,8 +1,5 @@
 #include "config.h"
-// 调试用库
-// #include "Adafruit_MPR121.h"
-#include "mpr121-helper.h"
-#include "mpr121-config.h"
+#include "cy8cmbr3116.h"
 #include "HID-Project.h"
 #include "serial.h"
 

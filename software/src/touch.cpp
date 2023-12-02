@@ -1,6 +1,5 @@
 #include "touch.h"
 
-static MPR121 capA, capB, capC; // mpr121定义
 uint8_t checkRelease[32];
 
 ////按键定义////
@@ -20,21 +19,9 @@ uint8_t TOUCH_THRESHOLD[32] = {
 // Init the touch part
 void touchSetup()
 {
-  // Default address is 0x5A, if tied to 3.3V its 0x5B
-  // If tied to SDA its 0x5C and if SCL then 0x5D
-  capA.begin(CA_ADDR);
-  capA.init();
-  capA.run();
+  cyInit();
 
-  capB.begin(CB_ADDR);
-  capB.init();
-  capB.run();
-
-  capC.begin(CC_ADDR);
-  capC.init();
-  capC.run();
-
-  Wire.setClock(800000); // I2C波特率
+  // Wire.setClock(800000); // I2C波特率
   Serial.println("[INFO] All MPR121 Connected!");
 
 }
@@ -47,121 +34,46 @@ int calCheck(int bl, int fd) {
 
 // 触摸检测
 void touchLoop() {
-  int16_t bl, fl, cal, calpress[32];
-
-  // 注意：FRAN 台 v1 的键位是反的
-  for (uint8_t i = 0; i < 12; i++)
-  { // 计算数值
-    bl = capA.baselineData(i);
-    fl = capA.filteredData(i);
-    cal = calCheck(bl, fl);
-    calpress[i] = CLAMP(cal, 0, 255);
-
-    bl = capB.baselineData(i);
-    fl = capB.filteredData(i);
-    cal = calCheck(bl, fl);
-    calpress[i + 12] = CLAMP(cal, 0, 255);
-    if (i >= 4)
+  int16_t cyStatus[2];
+  cyStatus[0] = cyGetRawButtonStatus(0x37);
+  cyStatus[1] = cyGetRawButtonStatus(0x38);
+  Serial.print("[DEBUG] Status: ");
+  for (int i = 0; i < 16; i++)
     {
-      bl = capC.baselineData(i);
-      fl = capC.filteredData(i);
-      cal = calCheck(bl, fl);
-      calpress[i + 20] = CLAMP(cal, 0, 255);
+      Serial.print(i);
+      Serial.print(": ");
+      bool temp = cyStatus[0] & (1 << i);
+      Serial.print(temp);
+      Serial.print("\t");
     }
-  }
-  // for (uint8_t i = 0; i < 32; i++) {
-  //   Serial.print(i);
-  //   Serial.print(": ");
-  //   Serial.print(calpress[i]);
-  //   Serial.print("\t");
-  // }
-  // Serial.println();
-  // FRAN台v1 需要单独校准 A0
-  for (uint8_t i = 0; i < 32; i++)
-  {
-    uint8_t calkeypress = calpress[i];
-    // Serial.println(calpress[i]);
-    if (calkeypress >= TOUCH_THRESHOLD[i])
+    for (int i = 0; i < 16; i++)
     {
-      checkRelease[i] = SLIDER_CMD_AUTO_SCAN;
+      Serial.print(i);
+      Serial.print(": ");
+      bool temp = cyStatus[1] & (1 << i);
+      Serial.print(temp);
+      Serial.print("\t");
+    }
+  Serial.println();
+  for (int i = 0; i < 16; i++) {
+    
+    if ((bool)(cyStatus[0] & (1 << i))) {
+      Serial.print(i);
       NKROKeyboard.press(KeyCode[i]);
     }
-    else
-    {
-      if (checkRelease[i])
-      {
-        checkRelease[i] = 0;
-        // Serial.print("[DEBUG] Release Key: ");
-        // Serial.println(i);
-        NKROKeyboard.release(KeyCode[i]);
-      }
-      continue;
+    else {
+      NKROKeyboard.release(KeyCode[i]);
+    }
+    if ((bool)(cyStatus[1] & (1 << i))) {
+      Serial.print(i + 15);
+      NKROKeyboard.press(KeyCode[i + 16]);
+    }
+    else {
+      NKROKeyboard.release(KeyCode[i + 16]);
     }
   }
 }
 
 void touchDebug() {
-  int16_t debugBaseline[32], debugFiltered[32];
-  int16_t cal, calpress[32];
-
-  // 注意：FRAN 台 v1 的键位是反的
-  for (uint8_t i = 0; i < 12; i++)
-  { // 计算数值
-    debugBaseline[i] = capA.baselineData(i);
-    debugFiltered[i] = capA.filteredData(i);
-    cal = calCheck(debugBaseline[i], debugFiltered[i]);
-    calpress[i] = CLAMP(cal, 0, 255);
-
-    debugBaseline[i + 12] = capB.baselineData(i);
-    debugFiltered[i + 12] = capB.filteredData(i);
-    cal = calCheck(debugBaseline[i + 12], debugFiltered[i + 12]);
-    calpress[i + 12] = CLAMP(cal, 0, 255);
-    if (i >= 4)
-    {
-      debugBaseline[i + 20] = capC.baselineData(i);
-      debugFiltered[i + 20] = capC.filteredData(i);
-      cal = calCheck(debugBaseline[i + 20], debugFiltered[i + 20]);
-      calpress[i + 20] = CLAMP(cal, 0, 255);
-    }
-  }
-
-  for (uint8_t i = 0; i < 32; i++) {
-    Serial.print(i);
-    Serial.print(": ");
-    Serial.print(calpress[i]);
-    Serial.print("\t");
-  }
-  Serial.println();
-  for (uint8_t i = 0; i < 12; i++) {
-    Serial.print("A");
-    Serial.print(i);
-    Serial.print("\tB");
-    Serial.print(debugBaseline[i]);
-    Serial.print("F");
-    Serial.print(debugFiltered[i]);
-    Serial.print("\t");
-  }
-  Serial.println();
-  for (uint8_t i = 0; i < 12; i++) {
-    Serial.print("B");
-    Serial.print(i);
-    Serial.print("\tB");
-    Serial.print(debugBaseline[i + 12]);
-    Serial.print("F");
-    Serial.print(debugFiltered[i + 12]);
-    Serial.print("\t");
-  }
-  Serial.println();
-  for (uint8_t i = 4; i < 12; i++) {
-    Serial.print("C");
-    Serial.print(i);
-    Serial.print("\tB");
-    Serial.print(debugBaseline[i + 20]);
-    Serial.print("F");
-    Serial.print(debugFiltered[i + 20]);
-    Serial.print("\t");
-  }
-  Serial.println();
-  Serial.println();
-  delay(100);
+  return;
 }
