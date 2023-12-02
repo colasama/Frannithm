@@ -37,35 +37,35 @@ void touchLoop() {
   int16_t cyStatus[2];
   cyStatus[0] = cyGetRawButtonStatus(0x37);
   cyStatus[1] = cyGetRawButtonStatus(0x38);
-  Serial.print("[DEBUG] Status: ");
-  for (int i = 0; i < 16; i++)
-    {
-      Serial.print(i);
-      Serial.print(": ");
-      bool temp = cyStatus[0] & (1 << i);
-      Serial.print(temp);
-      Serial.print("\t");
-    }
-    for (int i = 0; i < 16; i++)
-    {
-      Serial.print(i);
-      Serial.print(": ");
-      bool temp = cyStatus[1] & (1 << i);
-      Serial.print(temp);
-      Serial.print("\t");
-    }
-  Serial.println();
+  // Serial.print("[DEBUG] Status: ");
+  // for (int i = 0; i < 16; i++)
+  //   {
+  //     Serial.print(i);
+  //     Serial.print(": ");
+  //     bool temp = cyStatus[0] & (1 << i);
+  //     Serial.print(temp);
+  //     Serial.print("\t");
+  //   }
+  //   for (int i = 0; i < 16; i++)
+  //   {
+  //     Serial.print(i);
+  //     Serial.print(": ");
+  //     bool temp = cyStatus[1] & (1 << i);
+  //     Serial.print(temp);
+  //     Serial.print("\t");
+  //   }
+  // Serial.println();
   for (int i = 0; i < 16; i++) {
     
     if ((bool)(cyStatus[0] & (1 << i))) {
-      Serial.print(i);
+      // Serial.print(i);
       NKROKeyboard.press(KeyCode[i]);
     }
     else {
       NKROKeyboard.release(KeyCode[i]);
     }
     if ((bool)(cyStatus[1] & (1 << i))) {
-      Serial.print(i + 15);
+      // Serial.print(i + 15);
       NKROKeyboard.press(KeyCode[i + 16]);
     }
     else {

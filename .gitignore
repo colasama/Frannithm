@@ -1,3 +1,4 @@
 .pio
 .vscode/*
 build/
+utils/keyboard_map_generator/.vscode/settings.json

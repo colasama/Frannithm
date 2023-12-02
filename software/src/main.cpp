@@ -30,7 +30,7 @@ void setup() {
 
 void loop() {
 	// airDebug();
-    // airLoop(); 
+    airLoop(); 
     // touchDebug();
     touchLoop();
     // cyDebugAllButtonStatus();
