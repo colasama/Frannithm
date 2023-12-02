@@ -21,8 +21,7 @@ void touchSetup()
 {
   cyInit();
 
-  // Wire.setClock(800000); // I2C波特率
-  Serial.println("[INFO] All MPR121 Connected!");
+  Wire.setClock(800000); // I2C波特率
 
 }
 
