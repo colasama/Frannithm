@@ -1,8 +1,9 @@
 #include "touch.h"
 
-static MPR121 capA, capB, capC; // mpr121定义
+static Adafruit_MPR121 capA, capB, capC; // mpr121定义
 uint8_t checkRelease[32];
-
+uint16_t curTouched[3];
+uint16_t lastTouched[3] = {0, 0, 0};
 ////按键定义////
 KeyboardKeycode KeyCode[32] = {//键值列表
    KEY_I, KEY_COMMA, KEY_8, KEY_K, KEY_U, KEY_M, KEY_7, KEY_J, KEY_Y, KEY_N,
@@ -22,19 +23,19 @@ void touchSetup()
 {
   // Default address is 0x5A, if tied to 3.3V its 0x5B
   // If tied to SDA its 0x5C and if SCL then 0x5D
-  capA.begin(CA_ADDR);
-  capA.init();
-  capA.run();
-
-  capB.begin(CB_ADDR);
-  capB.init();
-  capB.run();
-
-  capC.begin(CC_ADDR);
-  capC.init();
-  capC.run();
-
   Wire.setClock(800000); // I2C波特率
+  if (!capA.begin(CA_ADDR)) {
+    Serial.println("MPR121 A not found, check wiring?");
+    while (1);
+  }
+  if (!capB.begin(CB_ADDR)) {
+    Serial.println("MPR121 B not found, check wiring?");
+    while (1);
+  }
+  if (!capC.begin(CC_ADDR)) {
+    Serial.println("MPR121 C not found, check wiring?");
+    while (1);
+  }
   Serial.println("[INFO] All MPR121 Connected!");
 
 }
@@ -43,6 +44,42 @@ void touchSetup()
 int calCheck(int bl, int fd) { 
   int cal = bl - fd;
   return cal > 4 ? 5 * cal : (cal > 0 ? cal : 0);
+}
+
+// 新款触摸检测
+void touchLoopNew() {
+  uint16_t curTouched[] = {
+    capA.touched(),
+    capB.touched(),
+    capC.touched()
+  };
+
+  for (uint8_t i = 0; i < 12; i++) {
+    // it if *is* touched and *wasnt* touched before, alert!
+    if ((curTouched[0] & _BV(i)) && !(lastTouched[0] & _BV(i)) ) {
+      NKROKeyboard.press(KeyCode[i]);
+    }
+    if ((curTouched[1] & _BV(i)) && !(lastTouched[1] & _BV(i)) ) {
+      NKROKeyboard.press(KeyCode[i + 12]);
+    }
+    if ((curTouched[2] & _BV(i)) && !(lastTouched[2] & _BV(i))) {
+      NKROKeyboard.press(KeyCode[i + 20]);
+    }
+    // if it *was* touched and now *isnt*, alert!
+    if (!(curTouched[0] & _BV(i)) && (lastTouched[0] & _BV(i)) ) {
+      NKROKeyboard.release(KeyCode[i]);
+    }
+    if (!(curTouched[1] & _BV(i)) && (lastTouched[1] & _BV(i)) ) {
+      NKROKeyboard.release(KeyCode[i + 12]);
+    }
+    if (!(curTouched[2] & _BV(i)) && (lastTouched[2] & _BV(i))) {
+      NKROKeyboard.release(KeyCode[i + 20]);
+    }
+  }
+
+  lastTouched[0] = curTouched[0];
+  lastTouched[1] = curTouched[1];
+  lastTouched[2] = curTouched[2];
 }
 
 // 触摸检测
