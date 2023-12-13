@@ -7,8 +7,8 @@
 #define MPR121CONF_TTH  32///< 触发阈值
 #define MPR121CONF_RTH  32///< 释放阈值
 // De-bounce     
-#define MPR121CONF_DR 4 ///< 松开样本采集数
-#define MPR121CONF_DT 0 ///< 按下样本采集数
+#define MPR121CONF_DR 1 ///< 松开样本采集数
+#define MPR121CONF_DT 1 ///< 按下样本采集数
 // AFE Configurations
 #define MPR121CONF_FFI  MPR121_FFI_6 ///< 一层过滤采样数
 #define MPR121CONF_CDC  0x3F ///< 充放电电流
@@ -20,14 +20,14 @@
 #define MPR121CONF_ELEPROX  MPR121_ELEPROX_0  ///< 接近检测电极，禁用
 #define MPR121CONF_ELE    12 ///< touch detection electrodes
 // 基线动态校准
-#define MPR121CONF_MHDR 1 ///< 上升最大变化值
-#define MPR121CONF_NHDR 8 ///< 上升幅度
-#define MPR121CONF_NCLR 16 ///< 上升修正样本个数/
-#define MPR121CONF_FDLR 2 ///< 修正前等待样本个数
-#define MPR121CONF_MHDF 1 ///< 下降最大变化值
+#define MPR121CONF_MHDR 2 ///< 上升最大变化值
+#define MPR121CONF_NHDR 2 ///< 上升幅度
+#define MPR121CONF_NCLR 4 ///< 上升修正样本个数/
+#define MPR121CONF_FDLR 0 ///< 修正前等待样本个数
+#define MPR121CONF_MHDF 2 ///< 下降最大变化值
 #define MPR121CONF_NHDF 1 ///< 下降幅度
-#define MPR121CONF_NCLF 16  ///< 下降修正样本个数
-#define MPR121CONF_FDLF 2 ///< 修正前等待样本个数
+#define MPR121CONF_NCLF 32  ///< 下降修正样本个数
+#define MPR121CONF_FDLF 4 ///< 修正前等待样本个数
 #define MPR121CONF_NHDT 0 ///< Touched Noise Half Delta
 #define MPR121CONF_NCLT 0 ///< Touched Noise Count Limit
 #define MPR121CONF_FDLT 0 ///< Touched Filter Delay Count Limit
@@ -39,7 +39,7 @@
 #define MPR121CONF_USL    156 ///< 上限，MPR121_UPLIMIT，((Vdd - 0.7)/Vdd) * 256
 #define MPR121CONF_LSL    101 ///< 下限，MPR121_LOWLIMIT，UPLIMIT * 0.65
 #define MPR121CONF_TL   140 ///< 目标，MPR121_TARGETLIMIT，UPLIMIT * 0.9
-
+// TODO : TRY 202 131 182
 // #define MPR121CONF_USL    166 ///< 上限，MPR121_UPLIMIT，((Vdd - 0.7)/Vdd) * 256，200
 // #define MPR121CONF_LSL    108 ///< 下限，MPR121_LOWLIMIT，UPLIMIT * 0.65，130
 // #define MPR121CONF_TL   149 ///< 目标，MPR121_TARGETLIMIT，UPLIMIT * 0.9，180
