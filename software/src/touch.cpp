@@ -20,15 +20,7 @@ uint8_t TOUCH_THRESHOLD[32] = {
 void touchSetup()
 {
   cyInit();
-
   Wire.setClock(800000); // I2C波特率
-
-}
-
-// 触摸数值计算
-int calCheck(int bl, int fd) { 
-  int cal = bl - fd;
-  return cal > 4 ? 5 * cal : (cal > 0 ? cal : 0);
 }
 
 // 触摸检测
@@ -54,7 +46,7 @@ void touchLoop() {
   //     Serial.print("\t");
   //   }
   // Serial.println();
-  for (int i = 0; i < 16; i++) {
+  for (uint8_t i = 0; i < 16; i++) {
     
     if ((bool)(cyStatus[0] & (1 << i))) {
       // Serial.print(i);

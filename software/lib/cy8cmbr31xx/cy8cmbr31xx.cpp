@@ -1,4 +1,4 @@
-#include "cy8cmbr3116.h"
+#include "cy8cmbr31xx.h"
 
 void cyInit()
 {
