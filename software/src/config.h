@@ -38,6 +38,6 @@
 #define CB_ADDR 0x5B
 #define CC_ADDR 0x5C
 #define CD_ADDR 0x5D
-#define TOUCH_THRESHOLD 45        // 默认触摸触发阈值，越低越灵敏
+// #define TOUCH_THRESHOLD 45        // 默认触摸触发阈值，越低越灵敏
 
 #endif

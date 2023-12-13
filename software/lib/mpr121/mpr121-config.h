@@ -18,7 +18,7 @@
 // ECR Configurations
 #define MPR121CONF_CL   MPR121_CL_INIT1 ///< 启用基线动态校准
 #define MPR121CONF_ELEPROX  MPR121_ELEPROX_0  ///< 接近检测电极，禁用
-#define MPR121CONF_ELE    12 ///< touch detection electrodes
+#define MPR121CONF_ELE    8 ///< touch detection electrodes
 // 基线动态校准
 #define MPR121CONF_MHDR 2 ///< 上升最大变化值
 #define MPR121CONF_NHDR 2 ///< 上升幅度
@@ -32,13 +32,13 @@
 #define MPR121CONF_NCLT 0 ///< Touched Noise Count Limit
 #define MPR121CONF_FDLT 0 ///< Touched Filter Delay Count Limit
 // 自动初始化
-// #define MPR121CONF_USL    200 ///< 上限，MPR121_UPLIMIT，((Vdd - 0.7)/Vdd) * 256，200
-// #define MPR121CONF_LSL    130 ///< 下限，MPR121_LOWLIMIT，UPLIMIT * 0.65，130
-// #define MPR121CONF_TL   180 ///< 目标，MPR121_TARGETLIMIT，UPLIMIT * 0.9，180
+#define MPR121CONF_USL    201 ///< 上限，MPR121_UPLIMIT，((Vdd - 0.7)/Vdd) * 256，200
+#define MPR121CONF_LSL    131 ///< 下限，MPR121_LOWLIMIT，UPLIMIT * 0.65，130
+#define MPR121CONF_TL   182 ///< 目标，MPR121_TARGETLIMIT，UPLIMIT * 0.9，180
 
-#define MPR121CONF_USL    156 ///< 上限，MPR121_UPLIMIT，((Vdd - 0.7)/Vdd) * 256
-#define MPR121CONF_LSL    101 ///< 下限，MPR121_LOWLIMIT，UPLIMIT * 0.65
-#define MPR121CONF_TL   140 ///< 目标，MPR121_TARGETLIMIT，UPLIMIT * 0.9
+// #define MPR121CONF_USL    156 ///< 上限，MPR121_UPLIMIT，((Vdd - 0.7)/Vdd) * 256
+// #define MPR121CONF_LSL    101 ///< 下限，MPR121_LOWLIMIT，UPLIMIT * 0.65
+// #define MPR121CONF_TL   140 ///< 目标，MPR121_TARGETLIMIT，UPLIMIT * 0.9
 // TODO : TRY 202 131 182
 // #define MPR121CONF_USL    166 ///< 上限，MPR121_UPLIMIT，((Vdd - 0.7)/Vdd) * 256，200
 // #define MPR121CONF_LSL    108 ///< 下限，MPR121_LOWLIMIT，UPLIMIT * 0.65，130

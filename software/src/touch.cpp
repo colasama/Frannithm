@@ -2,8 +2,8 @@
 
 static MPR121 capA, capB, capC, capD; // mpr121定义
 uint8_t checkRelease[32];
-uint16_t curTouched[3];
-uint16_t lastTouched[3] = {0, 0, 0};
+uint16_t curTouched[4];
+uint16_t lastTouched[4] = {0, 0, 0, 0};
 ////按键定义////
 KeyboardKeycode KeyCode[32] = {//键值列表
    KEY_I, KEY_COMMA, KEY_8, KEY_K, KEY_U, KEY_M, KEY_7, KEY_J, KEY_Y, KEY_N,
@@ -12,7 +12,7 @@ KeyboardKeycode KeyCode[32] = {//键值列表
    }; 
 
 uint8_t TOUCH_THRESHOLD[32] = {
-  210, 45, 45, 45, 45, 45, 45, 45,
+  45, 45, 45, 45, 45, 45, 45, 45,
   45, 45, 45, 45, 45, 45, 45, 45,
   45, 45, 45, 45, 45, 45, 45, 45,
   45, 45, 45, 45, 45, 45, 45, 45
@@ -40,18 +40,6 @@ void touchSetup()
   capD.run();
 
   Wire.setClock(800000); // I2C波特率
-  if (!capA.begin(CA_ADDR)) {
-    Serial.println("MPR121 A not found, check wiring?");
-    while (1);
-  }
-  if (!capB.begin(CB_ADDR)) {
-    Serial.println("MPR121 B not found, check wiring?");
-    while (1);
-  }
-  if (!capC.begin(CC_ADDR)) {
-    Serial.println("MPR121 C not found, check wiring?");
-    while (1);
-  }
   Serial.println("[INFO] All MPR121 Connected!");
 
 }
@@ -67,43 +55,48 @@ void touchLoopNew() {
   uint16_t curTouched[] = {
     capA.touched(),
     capB.touched(),
-    capC.touched()
+    capC.touched(),
+    capD.touched()
   };
+  Serial.print(curTouched[0], BIN);
+  Serial.print(curTouched[1], BIN);
+  Serial.print(curTouched[2], BIN);
+  Serial.print(curTouched[3], BIN);
 
-  for (uint8_t i = 0; i < 12; i++) {
-    // it if *is* touched and *wasnt* touched before, alert!
-    if ((curTouched[0] & _BV(i)) && !(lastTouched[0] & _BV(i)) ) {
-      NKROKeyboard.press(KeyCode[i]);
-    }
-    if ((curTouched[1] & _BV(i)) && !(lastTouched[1] & _BV(i)) ) {
-      NKROKeyboard.press(KeyCode[i + 12]);
-    }
-    if ((curTouched[2] & _BV(i)) && !(lastTouched[2] & _BV(i))) {
-      NKROKeyboard.press(KeyCode[i + 20]);
-    }
-    // if it *was* touched and now *isnt*, alert!
-    if (!(curTouched[0] & _BV(i)) && (lastTouched[0] & _BV(i)) ) {
-      NKROKeyboard.release(KeyCode[i]);
-    }
-    if (!(curTouched[1] & _BV(i)) && (lastTouched[1] & _BV(i)) ) {
-      NKROKeyboard.release(KeyCode[i + 12]);
-    }
-    if (!(curTouched[2] & _BV(i)) && (lastTouched[2] & _BV(i))) {
-      NKROKeyboard.release(KeyCode[i + 20]);
-    }
-  }
+  Serial.println();
+  // for (uint8_t i = 0; i < 12; i++) {
+  //   // it if *is* touched and *wasnt* touched before, alert!
+  //   if ((curTouched[0] & _BV(i)) && !(lastTouched[0] & _BV(i)) ) {
+  //     NKROKeyboard.press(KeyCode[i]);
+  //   }
+  //   if ((curTouched[1] & _BV(i)) && !(lastTouched[1] & _BV(i)) ) {
+  //     NKROKeyboard.press(KeyCode[i + 12]);
+  //   }
+  //   if ((curTouched[2] & _BV(i)) && !(lastTouched[2] & _BV(i))) {
+  //     NKROKeyboard.press(KeyCode[i + 20]);
+  //   }
+  //   // if it *was* touched and now *isnt*, alert!
+  //   if (!(curTouched[0] & _BV(i)) && (lastTouched[0] & _BV(i)) ) {
+  //     NKROKeyboard.release(KeyCode[i]);
+  //   }
+  //   if (!(curTouched[1] & _BV(i)) && (lastTouched[1] & _BV(i)) ) {
+  //     NKROKeyboard.release(KeyCode[i + 12]);
+  //   }
+  //   if (!(curTouched[2] & _BV(i)) && (lastTouched[2] & _BV(i))) {
+  //     NKROKeyboard.release(KeyCode[i + 20]);
+  //   }
+  // }
 
-  lastTouched[0] = curTouched[0];
-  lastTouched[1] = curTouched[1];
-  lastTouched[2] = curTouched[2];
+  // lastTouched[0] = curTouched[0];
+  // lastTouched[1] = curTouched[1];
+  // lastTouched[2] = curTouched[2];
 }
 
 // 触摸检测
 void touchLoop() {
   int16_t bl, fl, cal, calpress[32];
 
-  // 注意：FRAN 台 v1 的键位是反的
-  for (uint8_t i = 0; i < 12; i++)
+  for (uint8_t i = 0; i < 8; i++)
   { // 计算数值
     bl = capA.baselineData(i);
     fl = capA.filteredData(i);
@@ -113,44 +106,46 @@ void touchLoop() {
     bl = capB.baselineData(i);
     fl = capB.filteredData(i);
     cal = calCheck(bl, fl);
-    calpress[i + 12] = CLAMP(cal, 0, 255);
-    if (i >= 4)
-    {
-      bl = capC.baselineData(i);
-      fl = capC.filteredData(i);
-      cal = calCheck(bl, fl);
-      calpress[i + 20] = CLAMP(cal, 0, 255);
-    }
+    calpress[i + 8] = CLAMP(cal, 0, 255);
+    
+    bl = capC.baselineData(i);
+    fl = capC.filteredData(i);
+    cal = calCheck(bl, fl);
+    calpress[i + 16] = CLAMP(cal, 0, 255);
+
+    bl = capD.baselineData(i);
+    fl = capD.filteredData(i);
+    cal = calCheck(bl, fl);
+    calpress[i + 24] = CLAMP(cal, 0, 255);
   }
-  // for (uint8_t i = 0; i < 32; i++) {
-  //   Serial.print(i);
-  //   Serial.print(": ");
-  //   Serial.print(calpress[i]);
-  //   Serial.print("\t");
+  for (uint8_t i = 0; i < 32; i++) {
+    Serial.print(i);
+    Serial.print(": ");
+    Serial.print(calpress[i]);
+    Serial.print("\t");
+  }
+  Serial.println();
+  // for (uint8_t i = 0; i < 32; i++)
+  // {
+  //   uint8_t calkeypress = calpress[i];
+  //   // Serial.println(calpress[i]);
+  //   if (calkeypress >= TOUCH_THRESHOLD[i])
+  //   {
+  //     checkRelease[i] = SLIDER_CMD_AUTO_SCAN;
+  //     NKROKeyboard.press(KeyCode[i]);
+  //   }
+  //   else
+  //   {
+  //     if (checkRelease[i])
+  //     {
+  //       checkRelease[i] = 0;
+  //       // Serial.print("[DEBUG] Release Key: ");
+  //       // Serial.println(i);
+  //       NKROKeyboard.release(KeyCode[i]);
+  //     }
+  //     continue;
+  //   }
   // }
-  // Serial.println();
-  // FRAN台v1 需要单独校准 A0
-  for (uint8_t i = 0; i < 32; i++)
-  {
-    uint8_t calkeypress = calpress[i];
-    // Serial.println(calpress[i]);
-    if (calkeypress >= TOUCH_THRESHOLD[i])
-    {
-      checkRelease[i] = SLIDER_CMD_AUTO_SCAN;
-      NKROKeyboard.press(KeyCode[i]);
-    }
-    else
-    {
-      if (checkRelease[i])
-      {
-        checkRelease[i] = 0;
-        // Serial.print("[DEBUG] Release Key: ");
-        // Serial.println(i);
-        NKROKeyboard.release(KeyCode[i]);
-      }
-      continue;
-    }
-  }
 }
 
 void touchDebug() {
