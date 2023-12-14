@@ -41,14 +41,14 @@ boolean Adafruit_MPR121::begin(uint8_t i2caddr, TwoWire *theWire,
   if (c != 0x24)
     return false;
   setThresholds(touchThreshold, releaseThreshold);
-  writeRegister(MPR121_MHDR, 0x02);
-  writeRegister(MPR121_NHDR, 0x02);
-  writeRegister(MPR121_NCLR, 0x04);
+  writeRegister(MPR121_MHDR, 0x01);
+  writeRegister(MPR121_NHDR, 0x01);
+  writeRegister(MPR121_NCLR, 0x01);
   writeRegister(MPR121_FDLR, 0x00);
-  writeRegister(MPR121_MHDF, 0x02);
+  writeRegister(MPR121_MHDF, 0x01);
   writeRegister(MPR121_NHDF, 0x01);
-  writeRegister(MPR121_NCLF, 32);
-  writeRegister(MPR121_FDLF, 0x04);
+  writeRegister(MPR121_NCLF, 0x01);
+  writeRegister(MPR121_FDLF, 0x00);
   writeRegister(MPR121_NHDT, 0x00);
   writeRegister(MPR121_NCLT, 0x00);
   writeRegister(MPR121_FDLT, 0x00);
