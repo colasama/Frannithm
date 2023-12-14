@@ -9,6 +9,10 @@
 #define AIR_KEY_4 KEY_SEMICOLON
 #define AIR_KEY_5 KEY_QUOTE
 
+// LED 引脚
+#define LED_PIN 8
+#define NUM_LEDS 31
+
 // Pro Micro 中的发射引脚
 #define AIR_TX_PIN_0 5
 #define AIR_TX_PIN_1 A7

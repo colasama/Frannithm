@@ -1,9 +1,10 @@
 #include "touch.h"
 
-static MPR121 capA, capB, capC, capD; // mpr121定义
+static Adafruit_MPR121 capA, capB, capC, capD; // mpr121定义
 uint8_t checkRelease[32];
 uint16_t curTouched[4];
 uint16_t lastTouched[4] = {0, 0, 0, 0};
+CRGB keyboardLeds[NUM_LEDS];
 ////按键定义////
 KeyboardKeycode KeyCode[32] = {//键值列表
    KEY_I, KEY_COMMA, KEY_8, KEY_K, KEY_U, KEY_M, KEY_7, KEY_J, KEY_Y, KEY_N,
@@ -23,25 +24,34 @@ void touchSetup()
 {
   // Default address is 0x5A, if tied to 3.3V its 0x5B
   // If tied to SDA its 0x5C and if SCL then 0x5D
-  capA.begin(CA_ADDR);
-  capA.init();
-  capA.run();
-
-  capB.begin(CB_ADDR);
-  capB.init();
-  capB.run();
-
-  capC.begin(CC_ADDR);
-  capC.init();
-  capC.run();
-
-  capD.begin(CD_ADDR);
-  capD.init();
-  capD.run();
+  if (!capA.begin(CA_ADDR)) {
+    Serial.println("MPR121 A not found, check wiring?");
+    while (1);
+  }
+  if (!capB.begin(CB_ADDR)) {
+    Serial.println("MPR121 B not found, check wiring?");
+    while (1);
+  }
+  if (!capC.begin(CC_ADDR)) {
+    Serial.println("MPR121 C not found, check wiring?");
+    while (1);
+  }
+  if (!capD.begin(CD_ADDR)) {
+    Serial.println("MPR121 D not found, check wiring?");
+    while (1);
+  }
 
   Wire.setClock(800000); // I2C波特率
   Serial.println("[INFO] All MPR121 Connected!");
-
+  // LED 颜色初始化
+  FastLED.addLeds<WS2812B, LED_PIN, GRB>(keyboardLeds, NUM_LEDS);
+  for (uint8_t i = 0; i < 32; i++) {
+    keyboardLeds[i] = CRGB(255, 255, 0);
+  }
+  keyboardLeds[7] = CRGB(255, 0, 255);
+  keyboardLeds[15] = CRGB(255, 0, 255);
+  keyboardLeds[23] = CRGB(255, 0, 255);
+  FastLED[0].showLeds(255);
 }
 
 // 触摸数值计算
@@ -58,38 +68,54 @@ void touchLoopNew() {
     capC.touched(),
     capD.touched()
   };
-  Serial.print(curTouched[0], BIN);
-  Serial.print(curTouched[1], BIN);
-  Serial.print(curTouched[2], BIN);
-  Serial.print(curTouched[3], BIN);
+  // Serial.print(curTouched[0], BIN);
+  // Serial.print(curTouched[1], BIN);
+  // Serial.print(curTouched[2], BIN);
+  // Serial.print(curTouched[3], BIN);
 
-  Serial.println();
-  // for (uint8_t i = 0; i < 12; i++) {
-  //   // it if *is* touched and *wasnt* touched before, alert!
-  //   if ((curTouched[0] & _BV(i)) && !(lastTouched[0] & _BV(i)) ) {
-  //     NKROKeyboard.press(KeyCode[i]);
-  //   }
-  //   if ((curTouched[1] & _BV(i)) && !(lastTouched[1] & _BV(i)) ) {
-  //     NKROKeyboard.press(KeyCode[i + 12]);
-  //   }
-  //   if ((curTouched[2] & _BV(i)) && !(lastTouched[2] & _BV(i))) {
-  //     NKROKeyboard.press(KeyCode[i + 20]);
-  //   }
-  //   // if it *was* touched and now *isnt*, alert!
-  //   if (!(curTouched[0] & _BV(i)) && (lastTouched[0] & _BV(i)) ) {
-  //     NKROKeyboard.release(KeyCode[i]);
-  //   }
-  //   if (!(curTouched[1] & _BV(i)) && (lastTouched[1] & _BV(i)) ) {
-  //     NKROKeyboard.release(KeyCode[i + 12]);
-  //   }
-  //   if (!(curTouched[2] & _BV(i)) && (lastTouched[2] & _BV(i))) {
-  //     NKROKeyboard.release(KeyCode[i + 20]);
-  //   }
-  // }
+  // Serial.println();
+  for (uint8_t i = 0; i < 8; i++) {
+    // it if *is* touched and *wasnt* touched before, alert!
+    if ((curTouched[0] & _BV(i)) && !(lastTouched[0] & _BV(i)) ) {
+      keyboardLeds[2 * ((i + 24) / 2)] = CRGB(255, 0, 255);
+      NKROKeyboard.press(KeyCode[i]);
+    }
+    if ((curTouched[1] & _BV(i)) && !(lastTouched[1] & _BV(i)) ) {
+      keyboardLeds[2 * ((i + 16) / 2)] = CRGB(255, 0, 255);
+      NKROKeyboard.press(KeyCode[i + 8]);
+    }
+    if ((curTouched[2] & _BV(i)) && !(lastTouched[2] & _BV(i))) {
+      keyboardLeds[2 * ((i + 8) / 2)] = CRGB(255, 0, 255);
+      NKROKeyboard.press(KeyCode[i + 16]);
+    }
+    if ((curTouched[3] & _BV(i)) && !(lastTouched[3] & _BV(i))) {
+      keyboardLeds[2 * (i / 2)] = CRGB(255, 0, 255);
+      NKROKeyboard.press(KeyCode[i + 24]);
+    }
+    // if it *was* touched and now *isnt*, alert!
+    if (!(curTouched[0] & _BV(i)) && (lastTouched[0] & _BV(i)) ) {
+      keyboardLeds[2 * ((i + 24) / 2)] = CRGB(255, 255, 0);
+      NKROKeyboard.release(KeyCode[i]);
+    }
+    if (!(curTouched[1] & _BV(i)) && (lastTouched[1] & _BV(i)) ) {
+      keyboardLeds[2 * ((i + 16) / 2)] = CRGB(255, 255, 0);
+      NKROKeyboard.release(KeyCode[i + 8]);
+    }
+    if (!(curTouched[2] & _BV(i)) && (lastTouched[2] & _BV(i))) {
+      keyboardLeds[2 * ((i + 8) / 2)] = CRGB(255, 255, 0);
+      NKROKeyboard.release(KeyCode[i + 16]);
+    }
+    if (!(curTouched[3] & _BV(i)) && (lastTouched[3] & _BV(i))) {
+      keyboardLeds[2 * (i / 2)] = CRGB(255, 255, 0);
+      NKROKeyboard.release(KeyCode[i + 24]);
+    }
+  }
 
-  // lastTouched[0] = curTouched[0];
-  // lastTouched[1] = curTouched[1];
-  // lastTouched[2] = curTouched[2];
+  lastTouched[0] = curTouched[0];
+  lastTouched[1] = curTouched[1];
+  lastTouched[2] = curTouched[2];
+  lastTouched[3] = curTouched[3];
+  FastLED[0].showLeds(255);
 }
 
 // 触摸检测

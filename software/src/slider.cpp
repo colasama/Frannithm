@@ -1,19 +1,22 @@
 
 #include "slider.h"
 
-static Adafruit_MPR121 capA, capB, capC; // mpr121定义
+static Adafruit_MPR121 capA, capB, capC, capD; // mpr121定义
 uint8_t checkLed = 0;
 
-uint16_t curTouchedSlider[3];
-uint16_t lastTouchedSlider[3] = {0, 0, 0};
+uint16_t curTouchedSlider[4];
+uint16_t lastTouchedSlider[4] = {0, 0, 0, 0};
 
 bool autoScan = false;
 int keyMapForFranV1[32] = {22, 21, 24, 23, 26, 25, 28, 27, 30, 29, 32, 31, 10, 9, 12, 11, 14, 13, 16, 15, 18, 17, 20, 19, 2, 1, 4, 3, 6, 5, 8, 7};
+CRGB leds[NUM_LEDS];
+
 // Init the touch part
 void serialTouchSetup()
 {
   // Default address is 0x5A, if tied to 3.3V its 0x5B
   // If tied to SDA its 0x5C and if SCL then 0x5D
+  FastLED.addLeds<WS2812B, LED_PIN, GRB>(leds, NUM_LEDS);
   Wire.setClock(800000); // I2C波特率
   if (!capA.begin(CA_ADDR)) {
     Serial.println("MPR121 A not found, check wiring?");
@@ -27,7 +30,11 @@ void serialTouchSetup()
     Serial.println("MPR121 C not found, check wiring?");
     while (1);
   }
-  
+  if (!capD.begin(CC_ADDR)) {
+    Serial.println("MPR121 C not found, check wiring?");
+    while (1);
+  }
+
   Serial.println("[INFO] Serial Mode, All MPR121 Connected!");
 }
 
@@ -60,25 +67,25 @@ void sliderSetLED() {
   if (slider_tx_pending) {
     return;
   }
-  // uint8_t   r, g, b;
-  // uint16_t hash = 0;
-  // TODO: LED 相关，暂时不启用
-  // for (int i = 0; i < 31; i++) {
-  //   b = slider_req.leds[i * 3 + 0];
-  //   r = slider_req.leds[i * 3 + 1];
-  //   g = slider_req.leds[i * 3 + 2];
-  //   uint8_t l = i;
-  //   leds[l].r = g;
-  //   BSD_HASH(hash, g);
-  //   leds[l].g = r;
-  //   BSD_HASH(hash, r);
-  //   leds[l].b = b;
-  //   BSD_HASH(hash, b);
-  // }
-  // if (hash != prev_hash) {
-  //   prev_hash = hash;
-  //   FastLED[0].showLeds(255);
-  // }
+  uint8_t   r, g, b;
+  uint16_t hash = 0;
+  // TODO: LED 相关
+  for (int i = 0; i < 31; i++) {
+    b = slider_req.leds[i * 3 + 0];
+    r = slider_req.leds[i * 3 + 1];
+    g = slider_req.leds[i * 3 + 2];
+    uint8_t l = i;
+    leds[l].r = g;
+    BSD_HASH(hash, g);
+    leds[l].g = r;
+    BSD_HASH(hash, r);
+    leds[l].b = b;
+    BSD_HASH(hash, b);
+  }
+  if (hash != prev_hash) {
+    prev_hash = hash;
+    FastLED[0].showLeds(255);
+  }
   slider_req.cmd = 0;
 }
 
