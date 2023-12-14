@@ -8,7 +8,7 @@ uint16_t curTouchedSlider[4];
 uint16_t lastTouchedSlider[4] = {0, 0, 0, 0};
 
 bool autoScan = false;
-int keyMap[8] = {0, 1, 3, 2, 5, 4, 7, 6};
+int keyMapForFranV1[32] = {22, 21, 24, 23, 26, 25, 28, 27, 30, 29, 32, 31, 10, 9, 12, 11, 14, 13, 16, 15, 18, 17, 20, 19, 2, 1, 4, 3, 6, 5, 8, 7};
 CRGB leds[NUM_LEDS];
 
 // Init the touch part
@@ -16,12 +16,24 @@ void serialTouchSetup()
 {
   // Default address is 0x5A, if tied to 3.3V its 0x5B
   // If tied to SDA its 0x5C and if SCL then 0x5D
-  FastLED.addLeds<WS2812B, LED_PIN, RGB>(leds, NUM_LEDS);
+  FastLED.addLeds<WS2812B, LED_PIN, GRB>(leds, NUM_LEDS);
   Wire.setClock(800000); // I2C波特率
-  capA.begin(CA_ADDR);
-  capB.begin(CB_ADDR);
-  capC.begin(CC_ADDR);
-  capD.begin(CD_ADDR);
+  if (!capA.begin(CA_ADDR)) {
+    Serial.println("MPR121 A not found, check wiring?");
+    while (1);
+  }
+  if (!capB.begin(CB_ADDR)) {
+    Serial.println("MPR121 B not found, check wiring?");
+    while (1);
+  }
+  if (!capC.begin(CC_ADDR)) {
+    Serial.println("MPR121 C not found, check wiring?");
+    while (1);
+  }
+  if (!capD.begin(CC_ADDR)) {
+    Serial.println("MPR121 C not found, check wiring?");
+    while (1);
+  }
 
   Serial.println("[INFO] Serial Mode, All MPR121 Connected!");
 }
@@ -51,11 +63,11 @@ void serialTouchLoop() {
 }
 
 void sliderSetLED() {
-  uint16_t prev_hash = -1;
+      uint16_t prev_hash = -1;
   if (slider_tx_pending) {
     return;
   }
-  uint8_t r, g, b;
+  uint8_t   r, g, b;
   uint16_t hash = 0;
   // TODO: LED 相关
   for (int i = 0; i < 31; i++) {
@@ -91,10 +103,18 @@ void sliderScanStop() {
 }
 
 void sliderReset() {
-  capA.begin(CA_ADDR);
-  capB.begin(CB_ADDR);
-  capC.begin(CC_ADDR);
-  capD.begin(CD_ADDR);
+  if (!capA.begin(CA_ADDR)) {
+    Serial.println("MPR121 A not found, check wiring?");
+    while (1);
+  }
+  if (!capB.begin(CB_ADDR)) {
+    Serial.println("MPR121 B not found, check wiring?");
+    while (1);
+  }
+  if (!capC.begin(CC_ADDR)) {
+    Serial.println("MPR121 C not found, check wiring?");
+    while (1);
+  }
   slider_resp.syn = 0xff;
   slider_resp.cmd = SLIDER_CMD_RESET;
   slider_resp.size = 0;
@@ -121,85 +141,77 @@ void sliderScan() {
   uint16_t curTouchedSlider[] = {
     capA.touched(),
     capB.touched(),
-    capC.touched(),
-    capD.touched()
+    capC.touched()
   };
 
-  for (uint8_t i = 0; i < 8; i++) {
+  for (uint8_t i = 0; i < 12; i++) {
     // it if *is* touched and *wasnt* touched before, alert!
     if ((curTouchedSlider[0] & _BV(i)) && !(lastTouchedSlider[0] & _BV(i)) ) {
-      slider_resp.pressure[keyMap[i] + 24] = 255;
+      slider_resp.pressure[keyMapForFranV1[i] - 1] = 255;
     }
     if ((curTouchedSlider[1] & _BV(i)) && !(lastTouchedSlider[1] & _BV(i)) ) {
-      slider_resp.pressure[keyMap[i] + 16] = 255;
+      slider_resp.pressure[keyMapForFranV1[i + 12] - 1] = 255;
     }
     if ((curTouchedSlider[2] & _BV(i)) && !(lastTouchedSlider[2] & _BV(i))) {
-      slider_resp.pressure[keyMap[i] + 8] = 255;
-    }
-    if ((curTouchedSlider[3] & _BV(i)) && !(lastTouchedSlider[3] & _BV(i))) {
-      slider_resp.pressure[keyMap[i]] = 255;
+      if (i >= 4) {
+        slider_resp.pressure[keyMapForFranV1[i + 20] - 1] = 255;
+      }
     }
     // if it *was* touched and now *isnt*, alert!
     if (!(curTouchedSlider[0] & _BV(i)) && (lastTouchedSlider[0] & _BV(i)) ) {
-      slider_resp.pressure[keyMap[i] + 24] = 0;
+      slider_resp.pressure[keyMapForFranV1[i] - 1] = 0;
     }
     if (!(curTouchedSlider[1] & _BV(i)) && (lastTouchedSlider[1] & _BV(i)) ) {
-      slider_resp.pressure[keyMap[i] + 16] = 0;
+      slider_resp.pressure[keyMapForFranV1[i + 12] - 1] = 0;
     }
     if (!(curTouchedSlider[2] & _BV(i)) && (lastTouchedSlider[2] & _BV(i))) {
-      slider_resp.pressure[keyMap[i] + 8] = 0;
-    }
-    if (!(curTouchedSlider[3] & _BV(i)) && (lastTouchedSlider[3] & _BV(i))) {
-      slider_resp.pressure[keyMap[i]] = 0;
+      if (i >= 4) {
+        slider_resp.pressure[keyMapForFranV1[i + 20] - 1] = 0;
+      }
     }
   }
   lastTouchedSlider[0] = curTouchedSlider[0];
   lastTouchedSlider[1] = curTouchedSlider[1];
   lastTouchedSlider[2] = curTouchedSlider[2];
-  lastTouchedSlider[3] = curTouchedSlider[3];
 }
 
 void sliderDebug() {
   uint16_t curTouchedSlider[] = {
     capA.touched(),
     capB.touched(),
-    capC.touched(),
-    capD.touched()
+    capC.touched()
   };
 
-  for (uint8_t i = 0; i < 8; i++) {
+  for (uint8_t i = 0; i < 12; i++) {
     // it if *is* touched and *wasnt* touched before, alert!
     if ((curTouchedSlider[0] & _BV(i)) && !(lastTouchedSlider[0] & _BV(i)) ) {
-      Serial.print("A按下："); Serial.println(keyMap[i] + 24);
+      Serial.print("A按下："); Serial.println(i);
     }
     if ((curTouchedSlider[1] & _BV(i)) && !(lastTouchedSlider[1] & _BV(i)) ) {
-      Serial.print("B按下："); Serial.println(keyMap[i] + 16);
+      Serial.print("B按下："); Serial.println(i);
     }
     if ((curTouchedSlider[2] & _BV(i)) && !(lastTouchedSlider[2] & _BV(i))) {
-      Serial.print("C按下："); Serial.println(keyMap[i] + 8);
-    }
-    if ((curTouchedSlider[3] & _BV(i)) && !(lastTouchedSlider[3] & _BV(i))) {
-      Serial.print("D按下："); Serial.println(keyMap[i]);
+      if (i >= 4) {
+        Serial.print("C按下："); Serial.println(i);
+      }
     }
     // if it *was* touched and now *isnt*, alert!
     if (!(curTouchedSlider[0] & _BV(i)) && (lastTouchedSlider[0] & _BV(i)) ) {
-      Serial.print("A松开："); Serial.println(keyMap[i] + 24);
+      Serial.print("A松开："); Serial.println(i);
     }
     if (!(curTouchedSlider[1] & _BV(i)) && (lastTouchedSlider[1] & _BV(i)) ) {
-      Serial.print("B松开："); Serial.println(keyMap[i] + 16);
+      Serial.print("B松开："); Serial.println(i);
     }
     if (!(curTouchedSlider[2] & _BV(i)) && (lastTouchedSlider[2] & _BV(i))) {
-      Serial.print("C松开："); Serial.println(keyMap[i] + 8);
-    }
-    if (!(curTouchedSlider[3] & _BV(i)) && (lastTouchedSlider[3] & _BV(i))) {
-      Serial.print("D松开："); Serial.println(keyMap[i] + 0);
+      if (i >= 4) {
+        Serial.print("C松开："); Serial.println(i);
+      }
     }
   }
 
   lastTouchedSlider[0] = curTouchedSlider[0];
   lastTouchedSlider[1] = curTouchedSlider[1];
   lastTouchedSlider[2] = curTouchedSlider[2];
-  lastTouchedSlider[3] = curTouchedSlider[3];
 }
 // void sliderScan() {
 //   if (!autoScan || slider_tx_pending) {
@@ -215,23 +227,23 @@ void sliderDebug() {
 //     bv = capA.baselineData(i);
 //     fd = capA.filteredData(i);
 //     pressure = calTouch(bv, fd);
-//     slider_resp.pressure[keyMap[31 - i]] = CLAMP(pressure, 0, 255);
+//     slider_resp.pressure[keyMapForFranV1[31 - i]] = CLAMP(pressure, 0, 255);
 
 //     bv = capB.baselineData(i);
 //     fd = capB.filteredData(i);
 //     pressure = calTouch(bv, fd);
-//     slider_resp.pressure[keyMap[19 - i]] = CLAMP(pressure, 0, 255);
+//     slider_resp.pressure[keyMapForFranV1[19 - i]] = CLAMP(pressure, 0, 255);
 //     if (i >= 4)
 //     {
 //       bv = capC.baselineData(i);
 //       fd = capC.filteredData(i);
 //       pressure = calTouch(bv, fd);
-//       slider_resp.pressure[keyMap[11 - i]] = CLAMP(pressure, 0, 255);
+//       slider_resp.pressure[keyMapForFranV1[11 - i]] = CLAMP(pressure, 0, 255);
 //     }
 //   }
 //   // 键值重映射
 //   // for(uint8_t i = 0; i < 32; i++) {
-//   //   slider_resp.pressure[i] = pressures[keyMap[31 - i]];
+//   //   slider_resp.pressure[i] = pressures[keyMapForFranV1[31 - i]];
 //   // }
 //   // aircheck();//air检测
 //   // air_rgb_Serial();
@@ -243,17 +255,25 @@ void serialNotFound() {
     return;
   }
   if (checkserial) {
-    // LED 相关
-    for (uint8_t i = 0; i < 31; i++) {
-      leds[i] = CRGB(0, 255, 0);
-    }
-    FastLED.show();
+    // TODO: LED 相关，暂时不启用
+    // for (uint8_t i = 0; i < 32; i++) {
+    //   leds[i] = CRGB(0, 255, 0);
+    // }
+    // FastLED.show();
     checkserial = 0;
     checkLed = 0;
-    capA.begin(CA_ADDR);
-    capB.begin(CB_ADDR);
-    capC.begin(CC_ADDR);
-    capD.begin(CD_ADDR);
+    if (!capA.begin(CA_ADDR)) {
+      Serial.println("MPR121 A not found, check wiring?");
+      while (1);
+    }
+    if (!capB.begin(CB_ADDR)) {
+      Serial.println("MPR121 B not found, check wiring?");
+      while (1);
+    }
+    if (!capC.begin(CC_ADDR)) {
+      Serial.println("MPR121 C not found, check wiring?");
+      while (1);
+    }
     delay(100);
     return;
   }
