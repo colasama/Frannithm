@@ -41,7 +41,6 @@ void sliderScanStart();
 void sliderScanStop();
 void sliderReset();
 void sliderGetBoardInfo();
-void sliderGetBoardInfo();
 void sliderScan();
 void serialNotFound();
 void sliderDebug();

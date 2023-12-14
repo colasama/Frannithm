@@ -1,39 +1,38 @@
 /*!
- *  @file Adafruit_MPR121.h
+ * @file Adafruit_MPR121.cpp
  *
- *  This is a library for the MPR121 12-Channel Capacitive Sensor
+ *  @mainpage Adafruit MPR121 arduino driver
  *
- *  Designed specifically to work with the MPR121 board.
+ *  @section intro_sec Introduction
  *
- *  Pick one up today in the adafruit shop!
- *  ------> https://www.adafruit.com/product/1982
+ *  This is a library for the MPR121 I2C 12-chan Capacitive Sensor
  *
- *  These sensors use I2C to communicate, 2+ pins are required to interface
+ *  Designed specifically to work with the MPR121 sensor from Adafruit
+ *  ----> https://www.adafruit.com/products/1982
+ *
+ *  These sensors use I2C to communicate, 2+ pins are required to
+ *  interface
  *
  *  Adafruit invests time and resources providing this open source code,
- *  please support Adafruit andopen-source hardware by purchasing products
- *  from Adafruit!
+ *  please support Adafruit and open-source hardware by purchasing
+ *  products from Adafruit!
  *
- *  Limor Fried/Ladyada (Adafruit Industries).
+ *  @section author Author
  *
- *  BSD license, all text above must be included in any redistribution
+ *  Written by Limor Fried/Ladyada for Adafruit Industries.
+ *
+ *  @section license License
+ *
+ *  BSD license, all text here must be included in any redistribution.
  */
 
 #ifndef ADAFRUIT_MPR121_H
 #define ADAFRUIT_MPR121_H
-
 #include "Arduino.h"
-#include <Adafruit_BusIO_Register.h>
-#include <Adafruit_I2CDevice.h>
-
-// The default I2C address
-#define MPR121_I2CADDR_DEFAULT 0x5A        ///< default I2C address
-#define MPR121_TOUCH_THRESHOLD_DEFAULT 12  ///< default touch threshold value
-#define MPR121_RELEASE_THRESHOLD_DEFAULT 6 ///< default relese threshold value
-
-/*!
- *  Device register map
- */
+#include <Wire.h>
+#define MPR121_I2CADDR_DEFAULT 0x5A
+#define MPR121_TOUCH_THRESHOLD_DEFAULT 3
+#define MPR121_RELEASE_THRESHOLD_DEFAULT 0
 enum {
   MPR121_TOUCHSTATUS_L = 0x00,
   MPR121_TOUCHSTATUS_H = 0x01,
@@ -51,7 +50,6 @@ enum {
   MPR121_NHDT = 0x33,
   MPR121_NCLT = 0x34,
   MPR121_FDLT = 0x35,
-
   MPR121_TOUCHTH_0 = 0x41,
   MPR121_RELEASETH_0 = 0x42,
   MPR121_DEBOUNCE = 0x5B,
@@ -65,45 +63,31 @@ enum {
   MPR121_UPLIMIT = 0x7D,
   MPR121_LOWLIMIT = 0x7E,
   MPR121_TARGETLIMIT = 0x7F,
-
   MPR121_GPIODIR = 0x76,
   MPR121_GPIOEN = 0x77,
   MPR121_GPIOSET = 0x78,
   MPR121_GPIOCLR = 0x79,
   MPR121_GPIOTOGGLE = 0x7A,
-
   MPR121_SOFTRESET = 0x80,
 };
-
-//.. thru to 0x1C/0x1D
-
-/*!
- *  @brief  Class that stores state and functions for interacting with MPR121
- *  proximity capacitive touch sensor controller.
- */
 class Adafruit_MPR121 {
 public:
-  // Hardware I2C
   Adafruit_MPR121();
-
-  bool begin(uint8_t i2caddr = MPR121_I2CADDR_DEFAULT, TwoWire *theWire = &Wire,
-             uint8_t touchThreshold = MPR121_TOUCH_THRESHOLD_DEFAULT,
-             uint8_t releaseThreshold = MPR121_RELEASE_THRESHOLD_DEFAULT);
-
+  boolean begin(uint8_t i2caddr = MPR121_I2CADDR_DEFAULT,
+                TwoWire *theWire = &Wire,
+                uint8_t touchThreshold = MPR121_TOUCH_THRESHOLD_DEFAULT,
+                uint8_t releaseThreshold = MPR121_RELEASE_THRESHOLD_DEFAULT);
   uint16_t filteredData(uint8_t t);
   uint16_t baselineData(uint8_t t);
-
   uint8_t readRegister8(uint8_t reg);
   uint16_t readRegister16(uint8_t reg);
   void writeRegister(uint8_t reg, uint8_t value);
   uint16_t touched(void);
-  // Add deprecated attribute so that the compiler shows a warning
   void setThreshholds(uint8_t touch, uint8_t release)
       __attribute__((deprecated));
   void setThresholds(uint8_t touch, uint8_t release);
-
 private:
-  Adafruit_I2CDevice *i2c_dev = NULL;
+  int8_t _i2caddr;
+  TwoWire *_wire;
 };
-
 #endif

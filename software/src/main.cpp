@@ -2,7 +2,7 @@
 #include <Wire.h>
 #include "air.h"
 // 开启原生串口模式，注释掉则为键盘模式
-// #define ENABLE_SERIAL_MODE 1
+#define ENABLE_SERIAL_MODE 1
 
 #ifdef ENABLE_SERIAL_MODE
 #include "slider.h"
@@ -29,16 +29,16 @@ void setup() {
     #else
     touchSetup();
     #endif
-    // airSetup();
-    // airCalibrate();
+    airSetup();
+    airCalibrate();
 }
 
 void loop() {
 	// airDebug();
-    // airLoop(); 
+    airLoop(); 
     #ifdef ENABLE_SERIAL_MODE
     serialTouchLoop();
-    // slider/*Debug();
+    // sliderDebug();
     #else
     touchLoopNew();
     // touchDebug();
